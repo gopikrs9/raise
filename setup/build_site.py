@@ -1,6 +1,8 @@
 # Makes the hosted version (GitHub Pages) from the same build: same 45 screens, plus the live layer.
 import re, shutil, os
-SITE = "/home/claude/raise-site"
+import sys
+SITE = "/home/claude/raise-site" + ("/" + sys.argv[1] if len(sys.argv) > 1 else "")
+os.makedirs(SITE, exist_ok=True)
 page = open("/home/claude/raise/app7/index.html").read()
 live = open("/home/claude/raise/app7/live.js").read()
 # the app code waits for the live data, so it moves into a plain-text block that live.js runs

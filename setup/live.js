@@ -43,6 +43,8 @@
     out.lesson = { chapters: chs, first_lines: arr(pick(l.first_lines, R.first_lines)), say: pick(tc.ask, tc.open, ""), talk_card: tc, sparks: arr(pick(l.sparks, R.sparks)),
       second_try: pick(l.second_try, R.second_try), sources: srcs.length ? srcs : (old.lesson && old.lesson.sources) || [],
       audio: audio.length ? audio : (old.lesson && old.lesson.audio) || [] };
+    const tr = item.translations || {}; out.lesson.tr = {};
+    Object.keys(tr).forEach(lg => { const x = tr[lg] || {}; if (arr(x.chapters).length === chs.length) out.lesson.tr[lg] = { title: x.title, chapters: arr(x.chapters).map(c => ({ title: c.title, text: strip(c.text) })), first_lines: arr(x.first_lines), talk_card: x.talk_card || {}, second_try: x.second_try || null, sparks: arr(x.sparks) }; });
     out.duration_min = pick(R.duration_min, Math.max(8, Math.round(words / 150)));
     out.summary = pick(R.summary, t.summary, old.summary, ""); out.why_now = pick(R.why_now, t.why_now, old.why_now, "");
     out.short = pick(t.short, R.short, old.short, String(t.title || "").replace(/^When your teen (is |feels |shows signs of |faces )?/i, "").replace(/^./, c => c.toUpperCase()));
@@ -122,7 +124,7 @@
     async ask(q, t) {
       if (!sb) return null;
       track("doubt", { topic: t.slug, q: q.slice(0, 300) });
-      const r = await withTimeout(sb.functions.invoke("ask-doubt", { body: { q, slug: t.slug } }), 20000);
+      const r = await withTimeout(sb.functions.invoke("ask-doubt", { body: { q, slug: t.slug, lang: (RAISE.S.lang || "en") } }), 20000);
       if (r.error) return null;
       return r.data;
     },

@@ -913,7 +913,21 @@ try { S = Object.assign(fresh(), JSON.parse(localStorage.getItem("raise-v7b") ||
 const save = () => { try { localStorage.setItem("raise-v7b", JSON.stringify(S)); } catch (e) {} if (H.save) H.save(S); };
 const P = (slug = S.cur) => (S.t[slug] = S.t[slug] || { stage: "new", ch: 0, sent: 0, line: 0, date: null, place: "after dinner", saved: [], debrief: {}, tries: 0 });
 const T = () => bySlug(S.cur) || TOPICS[0];
-const L = () => T().lesson;
+/* lesson in the parent's language (Telugu / Hindi beta): text, first lines, talk card, second try. Screens stay in English. */
+const LANG_NAME = { en: "English", te: "Telugu", hi: "Hindi" }, LANG_CODE = { en: "en-IN", te: "te-IN", hi: "hi-IN" };
+const _lx = {};
+const hasLang = (t, lg) => !!(t && t.lesson && t.lesson.tr && t.lesson.tr[lg] && Array.isArray(t.lesson.tr[lg].chapters) && t.lesson.tr[lg].chapters.length === t.lesson.chapters.length);
+function LX(t){
+  const b = t && t.lesson; if (!b) return b; const lg = S.lang || "en"; if (lg === "en" || !hasLang(t, lg)) return b;
+  const key = t.slug + "|" + lg; if (_lx[key]) return _lx[key]; const tr = b.tr[lg];
+  return _lx[key] = Object.assign({}, b, {
+    chapters: b.chapters.map((c, i) => ({ n: c.n, secs: c.secs, title: tr.chapters[i].title || c.title, text: noCite(tr.chapters[i].text || c.text) })),
+    first_lines: Array.isArray(tr.first_lines) && tr.first_lines.length === 3 ? tr.first_lines : b.first_lines,
+    talk_card: Object.assign({}, b.talk_card || {}, tr.talk_card || {}), say: (tr.talk_card && (tr.talk_card.ask || tr.talk_card.open)) || b.say,
+    second_try: tr.second_try ? Object.assign({}, b.second_try || {}, tr.second_try) : b.second_try, sparks: Array.isArray(tr.sparks) && tr.sparks.length ? tr.sparks : b.sparks,
+    audio: [], lang: lg });
+}
+const L = () => LX(T());
 let playing = false;
 
 /* ---------------- dates ---------------- */
@@ -990,7 +1004,7 @@ function capture(){
   // me header and rows
   $$(".screen").forEach(sc => {
     const nm = byText(sc, "Lakshmi"); if (nm) { nm.dataset.b = "meName"; const av = byText(sc, "L"); if (av) av.dataset.b = "meAvatar"; const si = byText(sc, "Signed in with Google"); if (si) si.dataset.b = "meSign"; }
-    [["Child's age", "age"], ["My family note", "notes"], ["Text size", "textSize"], ["Discreet mode", "discreet"], ["Add a thought from", "lens"]].forEach(([p, k]) => {
+    [["Language", "lang"], ["Child's age", "age"], ["My family note", "notes"], ["Text size", "textSize"], ["Discreet mode", "discreet"], ["Add a thought from", "lens"]].forEach(([p, k]) => {
       $$("a", sc).filter(a => label(a).startsWith(p)).forEach(a => { const leaves = $$("span,div", a).filter(e => !e.children.length && e.textContent.trim() && !e.textContent.trim().startsWith(p)); if (leaves.length) leaves[leaves.length - 1].dataset.v = k; });
     });
   });
@@ -1089,7 +1103,7 @@ function drawHome(sc){
   const planned = Object.entries(S.t).find(([s, p]) => p.stage === "planned");
   const nc = $("[data-b=nextcard]", sc);
   if (nc) { nc.style.display = planned ? "" : "none";
-    if (planned) { const [s, p] = planned, t = bySlug(s); $("[data-b=nextwhen]", sc).textContent = `Your next step · ${dayLabel(p.date).toLowerCase()}, ${p.place}`; $("[data-b=nextline]", sc).textContent = `"${t.lesson.first_lines[p.line] || p.custom}"`; nc.dataset.topic = s; } }
+    if (planned) { const [s, p] = planned, t = bySlug(s); $("[data-b=nextwhen]", sc).textContent = `Your next step · ${dayLabel(p.date).toLowerCase()}, ${p.place}`; $("[data-b=nextline]", sc).textContent = `"${LX(t).first_lines[p.line] || p.custom}"`; nc.dataset.topic = s; } }
   const mc = $("[data-b=minicard]", sc), started = Object.entries(S.t).find(([s, p]) => p.stage === "listening");
   if (mc) { mc.style.display = started ? "" : "none"; if (started) { const t = bySlug(started[0]); $("[data-b=minititle]", sc).textContent = S.discreet ? t.category : (t.short || t.title); $("[data-b=mini]", sc).textContent = `Chapter ${started[1].ch + 1} of ${t.lesson.chapters.length} · ${playing ? "playing" : "paused"}`; mc.dataset.topic = started[0]; } }
 }
@@ -1152,7 +1166,7 @@ function drawNotes(sc){
   S.notes.forEach((n, i) => { const c = clone(TPL.note), sp = c.querySelectorAll("span"); sp[0].textContent = n.about; sp[1].textContent = dayLabel(n.date).replace("Tonight", "Today"); $$("div", c).filter(d => !d.children.length).pop().textContent = n.text; c.querySelector("button").dataset.note = i; box.append(c); });
 }
 function drawReflection(sc){
-  const t = T(), p = P(), d = p.debrief || {}, st = (t.lesson && t.lesson.second_try) || null, tc = (t.lesson && t.lesson.talk_card) || {};
+  const t = T(), p = P(), d = p.debrief || {}, st = (t.lesson && LX(t).second_try) || null, tc = (t.lesson && LX(t).talk_card) || {};
   const hard = ["Went quiet", "Walked off"].includes(d.resp) || d.feel === "Upset";
   const r1 = $("[data-b=rf1]", sc), r2 = $("[data-b=rf2]", sc);
   if (hard) {
@@ -1173,13 +1187,13 @@ function drawCommon(sc){
   $$("[data-b=greet]", sc).forEach(g => g.textContent = g.textContent.startsWith("Welcome") ? "Welcome back" : greet());
   const U = H.user ? H.user() : null;
   $$("[data-b=meName]", sc).forEach(e => e.textContent = (U && U.name) || "Parent"); $$("[data-b=meAvatar]", sc).forEach(e => e.textContent = ((U && U.name) || "P")[0].toUpperCase()); $$("[data-b=meSign]", sc).forEach(e => e.textContent = U && U.email ? "Signed in with Google" : U ? "Not signed in · saved securely for this phone" : "Not signed in · saved on this phone only");
-  $$("[data-v]", sc).forEach(e => { const k = e.dataset.v; e.textContent = k === "age" ? (S.age ? `${S.age} years` : "Not set") : k === "notes" ? (S.notes.length ? `${S.notes.length} ${S.notes.length === 1 ? "note" : "notes"}` : "None") : k === "discreet" ? (S.discreet ? "On" : "Off") : S[k]; });
+  $$("[data-v]", sc).forEach(e => { const k = e.dataset.v; e.textContent = k === "age" ? (S.age ? `${S.age} years` : "Not set") : k === "notes" ? (S.notes.length ? `${S.notes.length} ${S.notes.length === 1 ? "note" : "notes"}` : "None") : k === "discreet" ? (S.discreet ? "On" : "Off") : k === "lang" ? ({ en: "English", te: "తెలుగు", hi: "हिन्दी" }[S.lang || "en"]) : S[k]; });
   $$("[data-b=email]", sc).forEach(e => e.textContent = (U && U.email) || "Not signed in yet");
 }
 
 /* ---------------- lesson player ---------------- */
 const CHS = () => L().chapters;
-const sentences = i => CHS()[i].text.match(/[^.!?]+[.!?]+["”']?|\S[^.!?]*$/g) || [CHS()[i].text];
+const sentences = i => CHS()[i].text.match(/[^.!?।]+[.!?।]+["”']?|\S[^.!?।]*$/g) || [CHS()[i].text];
 const mm = s => `${Math.floor(s / 60)}:${String(Math.round(s % 60)).padStart(2, "0")}`;
 function drawPlayer(sc){
   if (!ready(T())) return; const p = P(), c = CHS()[p.ch], N = CHS().length, total = c.secs, done = Math.min(total, total * (p.sent / sentences(p.ch).length));
@@ -1204,9 +1218,9 @@ function drawPlayer(sc){
 }
 function drawTalk(sc){
   const t = T(), p = P(); if (!ready(t)) return;
-  $$("[data-b=firstline]", sc).forEach(e => e.textContent = `"${p.custom || t.lesson.first_lines[p.line]}"`);
+  $$("[data-b=firstline]", sc).forEach(e => e.textContent = `"${p.custom || LX(t).first_lines[p.line]}"`);
   $$("[data-b=when]", sc).forEach(e => e.textContent = `${dayLabel(p.date)} · ${p.place}`);
-  const wh = $("[data-b=tcwhyhead]", sc); if (wh) { wh.textContent = "If it goes wrong"; $("[data-b=tcwhy]", sc).textContent = noCite(t.lesson.talk_card.if_it_goes_wrong); }
+  const wh = $("[data-b=tcwhyhead]", sc); if (wh) { wh.textContent = "If it goes wrong"; $("[data-b=tcwhy]", sc).textContent = noCite(LX(t).talk_card.if_it_goes_wrong); }
   const db = $("[data-b=dbsub]"); if (db) db.textContent = `${t.short || t.title} · planned for ${dayLabel(p.date).toLowerCase()}`;
   const gp = $("[data-b=gatep]"); if (gp) gp.innerHTML = `You planned to talk about <strong>${esc((t.short || t.title).toLowerCase())}</strong> ${p.date === today ? "tonight" : "on " + dayLabel(p.date)}. Did you get to it?`;
 }
@@ -1216,8 +1230,17 @@ function drawClosing(sc){
   const ct = $("[data-b=cltitle]", sc); if (ct) ct.textContent = `${t.short || t.title} · ${t.duration_min} min`;
 }
 
+function drawLang(sc, id){
+  // talk screens: one tap between English and Telugu
+  $$("button", sc).filter(b => /^Show in (Telugu|English)$/.test(label(b))).forEach(b => { const leaf = $$("*", b).filter(e => !e.children.length && e.textContent.trim()).pop() || b; const shown = (T() && ready(T()) && LX(T()).lang) || "en"; leaf.textContent = shown === "en" ? "Show in Telugu" : "Show in English"; });
+  if (id === "Language") {
+    $$("button", sc).forEach(b => { const k = label(b), lg = /Telugu|తెలుగు/.test(k) ? "te" : /Hindi|हिन्दी/.test(k) ? "hi" : /^English/.test(k) ? "en" : null; if (!lg) return;
+      $$("*", b).filter(e => !e.children.length && /Coming soon|Beta/.test(e.textContent)).forEach(e => e.textContent = "Beta");
+      if (lg === (S.lang || "en") && !b.dataset.on) { choose(b); } b.dataset.on = lg === (S.lang || "en") ? "1" : ""; });
+  }
+}
 function fill(sc){
-  drawCommon(sc); const id = sc.id.slice(2);
+  drawCommon(sc); const id = sc.id.slice(2); drawLang(sc, id);
   if (["Home", "Offline", "Gate", "Preview"].includes(id)) drawHome(sc);
   if (id === "Preview") drawPreview(sc);
   if (id === "SeeAll") drawSeeAll(sc);
@@ -1266,7 +1289,9 @@ function speak(){
   }
   if (!("speechSynthesis" in window)) { stop(); refresh(); toast("This browser cannot read aloud. Tap Read."); return; }
   const ss = sentences(p.ch); if (p.sent >= ss.length) return nextChapter();
-  const u = new SpeechSynthesisUtterance(ss[p.sent]); u.lang = "en-IN"; u.rate = 0.95 * S.rate;
+  const u = new SpeechSynthesisUtterance(ss[p.sent]); const lc = LANG_CODE[L().lang || "en"]; u.lang = lc; u.rate = 0.95 * S.rate;
+  const vs = speechSynthesis.getVoices(), v = vs.find(x => x.lang.replace("_", "-").toLowerCase() === lc.toLowerCase()) || vs.find(x => x.lang.toLowerCase().startsWith(lc.slice(0, 2)));
+  if (v) u.voice = v; else if (lc !== "en-IN" && !speak.warned) { speak.warned = true; toast(`This phone has no ${LANG_NAME[L().lang]} voice. Tap Read to follow along, or add ${LANG_NAME[L().lang]} in your phone's text-to-speech settings.`); }
   u.onend = () => { if (!playing) return; p.sent++; save(); refresh(); speak(); };
   speechSynthesis.speak(u);
 }
@@ -1394,7 +1419,8 @@ function handle(t){
   // plan
   if (k === "See 2 other lines") { p.line = (p.line + 1) % L().first_lines.length; p.custom = null; save(); return refresh(); }
   if (k === "Edit line") { const f = $(`#s-${sc} [data-b=firstline]`); f.contentEditable = "true"; f.focus(); return toast("Type your own words, then tap Save my plan."); }
-  if (k === "Show in Telugu") return toast("Telugu lessons are coming soon.");
+  if (k === "Show in Telugu") { if (!hasLang(T(), "te")) return toast("The Telugu version of this lesson is still being prepared."); S.lang = "te"; save(); refresh(); return toast("Showing this lesson in Telugu (beta)."); }
+  if (k === "Show in English") { S.lang = "en"; save(); refresh(); return toast("Showing this lesson in English."); }
   if (t.getAttribute("role") === "switch") { const on = t.getAttribute("aria-checked") === "true";
     if (k.startsWith("Send a curiosity question")) return show(on ? "Ready" : "Spark");
     if (k.startsWith("Hide topic names")) { S.discreet = !on; save(); }
@@ -1427,7 +1453,9 @@ function handle(t){
 
   // me
   if (k === "Call") { const n = (t.closest("div").parentElement.textContent.match(/1098|14416|1930/) || [""])[0]; return toast(`On a phone this calls ${n}. Raise does not record the call.`); }
-  if (sc === "Language") { if (/Coming soon/.test(k)) return toast("Hindi and Telugu lessons are coming soon."); if (k === "English") return toast("English is on."); }
+  if (sc === "Language" && t.tagName === "BUTTON") { const lg = /Telugu|తెలుగు/.test(k) ? "te" : /Hindi|हिन्दी/.test(k) ? "hi" : /^English/.test(k) ? "en" : null;
+    if (lg) { stop(); S.lang = lg; save(); refresh(); const n = TOPICS.filter(x => ready(x) && (lg === "en" || hasLang(x, lg))).length;
+      return toast(lg === "en" ? "Lessons in English." : `Lessons in ${LANG_NAME[lg]} (beta): ${n} ready. Others stay in English until their ${LANG_NAME[lg]} version is checked. Screens stay in English for now.`); } }
   if (["Standard", "Large", "Extra large"].includes(k)) { S.textSize = k; choose(t); save(); return toast(`Text size: ${k}. Lesson text uses it.`); }
   if (sc === "Lens" && t.tagName === "BUTTON" && !k.startsWith("Not listed") && k !== "Close") { choose(t); S.lens = k; save(); refresh(); return toast(k === "None" ? "No thoughts added." : `Saved. A passage from ${k} appears once it is checked against the original.`); }
   if (k === "Not listed? Ask Raise to add someone") return toast("Request noted. A name is added only after its passages are checked.");
@@ -1533,6 +1561,8 @@ window.RAISE_BAKED = {"topics": [{"slug": "phone-late-night", "title": "When you
     out.lesson = { chapters: chs, first_lines: arr(pick(l.first_lines, R.first_lines)), say: pick(tc.ask, tc.open, ""), talk_card: tc, sparks: arr(pick(l.sparks, R.sparks)),
       second_try: pick(l.second_try, R.second_try), sources: srcs.length ? srcs : (old.lesson && old.lesson.sources) || [],
       audio: audio.length ? audio : (old.lesson && old.lesson.audio) || [] };
+    const tr = item.translations || {}; out.lesson.tr = {};
+    Object.keys(tr).forEach(lg => { const x = tr[lg] || {}; if (arr(x.chapters).length === chs.length) out.lesson.tr[lg] = { title: x.title, chapters: arr(x.chapters).map(c => ({ title: c.title, text: strip(c.text) })), first_lines: arr(x.first_lines), talk_card: x.talk_card || {}, second_try: x.second_try || null, sparks: arr(x.sparks) }; });
     out.duration_min = pick(R.duration_min, Math.max(8, Math.round(words / 150)));
     out.summary = pick(R.summary, t.summary, old.summary, ""); out.why_now = pick(R.why_now, t.why_now, old.why_now, "");
     out.short = pick(t.short, R.short, old.short, String(t.title || "").replace(/^When your teen (is |feels |shows signs of |faces )?/i, "").replace(/^./, c => c.toUpperCase()));
@@ -1612,7 +1642,7 @@ window.RAISE_BAKED = {"topics": [{"slug": "phone-late-night", "title": "When you
     async ask(q, t) {
       if (!sb) return null;
       track("doubt", { topic: t.slug, q: q.slice(0, 300) });
-      const r = await withTimeout(sb.functions.invoke("ask-doubt", { body: { q, slug: t.slug } }), 20000);
+      const r = await withTimeout(sb.functions.invoke("ask-doubt", { body: { q, slug: t.slug, lang: (RAISE.S.lang || "en") } }), 20000);
       if (r.error) return null;
       return r.data;
     },

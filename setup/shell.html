@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Raise App (version 7)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{ --stage:#EFE6DC; --ink:#2A2233; --plum:#4A2C5A; --quiet:#6B6375; --card:#FFFFFF; --font:'Plus Jakarta Sans',system-ui,sans-serif; color-scheme:light; }
+/* layout: the v7 phone (390 x 844) centred and scaled to fit; a screen list beside it on wide windows */
+html,body{height:100%;margin:0}
+body{background:var(--stage);font-family:var(--font);color:var(--ink);display:flex;align-items:center;justify-content:center;gap:28px;overflow:hidden}
+#phone{width:390px;height:844px;position:relative;flex:none;border-radius:32px;overflow:hidden;box-shadow:0 20px 50px rgba(42,34,51,.22);transform-origin:center center;background:#FFF8F0}
+.screen{position:absolute;inset:0}
+.screen[hidden]{display:none}
+.screen a{cursor:pointer}
+.screen button:focus-visible,.screen a:focus-visible,.screen input:focus-visible{outline:3px solid #F4A261;outline-offset:2px}
+#toast{position:absolute;left:16px;right:16px;bottom:96px;z-index:50;background:var(--ink);color:#fff;border-radius:18px;padding:14px 16px;font-size:15px;line-height:1.4;box-shadow:0 8px 20px rgba(42,34,51,.25);opacity:0;pointer-events:none;transition:opacity .2s}
+#toast.on{opacity:1}
+.scroller{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;scrollbar-width:none}
+.scroller::-webkit-scrollbar,.hscroll::-webkit-scrollbar{display:none}
+.hscroll{overflow-x:auto!important;scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;overscroll-behavior-x:contain}
+.hscroll>*{scroll-snap-align:start}
+#phone [data-topic]{cursor:pointer}
+#index{width:260px;max-height:844px;overflow-y:auto;background:var(--card);border-radius:20px;padding:14px;box-sizing:border-box;align-self:center}
+#index h2{font-size:16px;margin:4px 6px 4px}
+#index p{font-size:13px;color:var(--quiet);margin:0 6px 10px;line-height:1.4}
+#index button{display:block;width:100%;text-align:left;border:0;background:none;font:500 14px var(--font);color:var(--ink);padding:7px 8px;border-radius:10px;cursor:pointer}
+#index button[aria-current="true"]{background:#FDEBDD;color:var(--plum);font-weight:700}
+#index button:hover{background:#F6EFE7}
+@media (max-width:760px){ #index{display:none} body{gap:0} }
+@media (prefers-reduced-motion:reduce){ #toast{transition:none} }
+</style>
+</head>
+<body>
+<aside id="index" aria-label="All screens">
+  <h2>Raise · version 7</h2>
+  <p>A working build of the 45 v7 screens. Tap through the phone, or jump to any screen here.</p>
+  <!--INDEX-->
+</aside>
+<div id="phone">
+<!--SCREENS-->
+<div id="toast" role="status" aria-live="polite"></div>
+</div>
+<script>
+/*APPJS*/
+</script>
+</body>
+</html>
