@@ -1042,10 +1042,13 @@ function drawHome(sc){
   if (chips) chips.innerHTML = ["All", ...cats()].map(c => `<button data-cat="${esc(c)}" style="${c === S.filter ? TPL.chipOn : TPL.chipOff}">${esc(c)}</button>`).join("");
   const slot = $("[data-b=rows]", sc);
   if (slot) { slot.innerHTML = "";
-    cats().filter(c => S.filter === "All" || c === S.filter).forEach(c => {
-      const hd = clone(TPL.head); $("h2", hd).textContent = c; $("a", hd).dataset.see = c; slot.append(hd);
-      const row = TPL.row.cloneNode(false); TOPICS.filter(t => t.category === c).forEach(t => row.append(card(t))); slot.append(row);
-    }); }
+    const section = (title, list, see) => { if (!list.length) return; const hd = clone(TPL.head); $("h2", hd).textContent = title; $("a", hd).dataset.see = see; slot.append(hd);
+      const row = TPL.row.cloneNode(false); list.forEach(t => row.append(card(t))); slot.append(row); };
+    if (S.filter === "All") {
+      // every finished lesson together first, then the ones the factory is still writing
+      section("Ready to listen", TOPICS.filter(ready), "All");
+      section("Being written", TOPICS.filter(t => !ready(t)), "All");
+    } else section(S.filter, TOPICS.filter(t => t.category === S.filter), S.filter); }
   const planned = Object.entries(S.t).find(([s, p]) => p.stage === "planned");
   const nc = $("[data-b=nextcard]", sc);
   if (nc) { nc.style.display = planned ? "" : "none";
@@ -1065,8 +1068,8 @@ function drawPreview(sc){
   $("[data-b=pvmeta]", sc).textContent = ready(t) ? `${t.duration_min} min · ${t.lesson.chapters.length} chapters · ${t.lesson.sources.length} research papers` : "Found by the Raise topic finder from research and reports";
 }
 function drawSeeAll(sc){
-  const c = S.seeCat || cats()[0], list = TOPICS.filter(t => t.category === c);
-  $("[data-b=sahead]", sc).textContent = c;
+  const c = S.seeCat || "All", list = c === "All" ? TOPICS.filter(ready).concat(TOPICS.filter(t => !ready(t))) : TOPICS.filter(t => t.category === c);
+  $("[data-b=sahead]", sc).textContent = c === "All" ? "All topics" : c;
   const r = list.filter(ready).length; $("[data-b=sasub]", sc).textContent = `${list.length} ${list.length === 1 ? "topic" : "topics"} · ${r} ready to listen`;
   const g = $("[data-b=sagrid]", sc); g.innerHTML = ""; list.forEach(t => g.append(card(t, true)));
 }
