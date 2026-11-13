@@ -29,9 +29,11 @@ body{background:var(--stage);font-family:var(--font);color:var(--ink);display:fl
 #index button:hover{background:#F6EFE7}
 @media (max-width:760px){ #index{display:none} body{gap:0;background:#FFF8F0} #phone{border-radius:0;box-shadow:none} }
 @media (prefers-reduced-motion:reduce){ #toast{transition:none} }
+body:not(.review) #index{display:none} body:not(.review){gap:0}
 </style>
 </head>
 <body>
+<script>if (/[?&]review\b/.test(location.search)) document.body.classList.add('review');</script>
 <aside id="index" aria-label="All screens">
   <h2>Raise · version 7</h2>
   <p>A working build of the 45 v7 screens. Tap through the phone, or jump to any screen here.</p>
@@ -918,7 +920,7 @@ function dayLabel(isoDate){ if (!isoDate) return "Not planned"; if (isoDate === 
 const greet = () => { const h = new Date().getHours(); return h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening"; };
 
 /* ---------------- phone frame ---------------- */
-function fit(){ const k = Math.min(1, (innerHeight - 24) / 844, (innerWidth - (innerWidth > 760 ? 300 : 0) - 16) / 390); const p = $("#phone"); p.style.transform = `scale(${k})`; p.style.margin = `${(844 * k - 844) / 2}px ${(390 * k - 390) / 2}px`; }
+function fit(){ const side = innerWidth > 760 && getComputedStyle($("#index")).display !== "none" ? 300 : 0, phone = innerWidth <= 500; const k = Math.min(phone ? 2 : 1, (innerHeight - (phone ? 0 : 24)) / 844, (innerWidth - side - (phone ? 0 : 16)) / 390); const p = $("#phone"); p.style.transform = `scale(${k})`; p.style.margin = `${(844 * k - 844) / 2}px ${(390 * k - 390) / 2}px`; }
 addEventListener("resize", fit); fit();
 let tt; function toast(t){ const el = $("#toast"); el.textContent = t; el.classList.add("on"); clearTimeout(tt); tt = setTimeout(() => el.classList.remove("on"), 2800); }
 
