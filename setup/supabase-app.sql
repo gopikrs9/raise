@@ -38,11 +38,7 @@ create policy "own events delete" on public.app_events for delete to authenticat
 
 -- 3. The live lesson feed the app reads on open: published lessons, covers, recorded voice, research sources
 create or replace function public.app_catalog()
-returns jsonb
-language sql
-stable
-security definer
-set search_path = ''
+returns jsonb language sql stable security definer set search_path = ''
 as $$
   select jsonb_build_object(
     'topics', coalesce((
@@ -51,21 +47,20 @@ as $$
         select t.created_at, (t.status = 'published') as pub,
           jsonb_build_object(
             't', to_jsonb(t) - 'research_text' - 'search_queries' - 'rewrite_notes',
-            'lesson', (select to_jsonb(l) - 'read_script' - 'code_notes'
-                       from public.lessons l where l.topic_id = t.id and t.status = 'published'
-                       order by l.version desc nulls last, l.created_at desc limit 1),
+            'lesson', (select (to_jsonb(l) - 'read_script' - 'code_notes' - 'raw') || jsonb_build_object('raw', coalesce(l.raw, '{}'::jsonb) - 'chapters' - 'read' - 'claims')
+                       from public.lessons l where l.id = lt.id),
             'sources', (select jsonb_agg(to_jsonb(s) - 'abstract') from public.sources s where s.topic_id = t.id and t.status = 'published'),
-            'audio', (select jsonb_agg(to_jsonb(a) - 'body') from public.lesson_audio a
-                      join public.lessons l2 on l2.id = a.lesson_id
-                      where l2.topic_id = t.id and a.status = 'done' and t.status = 'published')
+            'audio', (select jsonb_agg(to_jsonb(a) - 'body' order by a.chapter, a.part) from public.lesson_audio a where a.lesson_id = lt.id and a.status = 'done')
           ) as item
         from public.topics t
-        where t.status not in ('rejected', 'archived', 'held')
+        left join lateral (select l.id from public.lessons l where l.topic_id = t.id and t.status = 'published'
+                           order by l.version desc nulls last, l.created_at desc limit 1) lt on true
+        where t.status not in ('rejected', 'archived', 'held', 'failed')
       ) x
     ), '[]'::jsonb),
     'factory', jsonb_build_object(
       'published', (select count(*) from public.topics where status = 'published'),
-      'queued', (select count(*) from public.topics where status not in ('published', 'rejected', 'archived', 'held')),
+      'queued', (select count(*) from public.topics where status not in ('published', 'rejected', 'archived', 'held', 'failed')),
       'candidates', (select count(*) from public.topic_candidates),
       'sources', (select count(*) from public.sources) + (select count(*) from public.discovery_sources)
     )
