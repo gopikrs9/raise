@@ -1078,10 +1078,10 @@ function openLangMenu(from){
   closeLangMenu(); const ph = $("#phone"), r = from.getBoundingClientRect(), pr = ph.getBoundingClientRect(), k = pr.width / 390;
   const m = document.createElement("div"); m.id = "langmenu"; m.setAttribute("role", "menu");
   m.setAttribute("style", `position:absolute;z-index:60;right:${Math.max(12, (pr.right - r.right) / k)}px;top:${(r.bottom - pr.top) / k + 6}px;width:230px;background:#FFFFFF;border-radius:18px;box-shadow:0 12px 32px rgba(42,34,51,.22);padding:8px`);
-  const t = T(), lg = S.lang || "en";
+  const t = T(), lg = S.lang || "en", inLes = !from.closest("#s-Home,#s-Main,#s-Offline,#s-Gate,#s-Preview,#s-GoogleFail");
   m.innerHTML = `<div style="font-size:12.5px;font-weight:700;color:#6B6375;padding:6px 10px 4px">Lesson language</div>` + LANGS.map(([c, n]) => {
-    const missing = c !== "en" && t && ready(t) && !hasLang(t, c);
-    return `<button role="menuitemradio" aria-checked="${c === lg}" data-lang="${c}" style="display:flex;align-items:center;justify-content:space-between;width:100%;border:none;background:${c === lg ? "#FDEBDD" : "none"};font-family:inherit;cursor:pointer;height:46px;padding:0 10px;border-radius:12px;font-size:16px;font-weight:${c === lg ? 700 : 600};color:#2A2233;text-align:left"><span>${n}${c === "en" ? "" : ` <span style="font-size:12.5px;color:#6B6375;font-weight:600">${LANG_NAME[c]} · beta${missing ? " · not for this lesson yet" : ""}</span>`}</span>${c === lg ? "<span style=\"color:#4A2C5A\">✓</span>" : ""}</button>`; }).join("")
+    const missing = c !== "en" && inLes && t && ready(t) && !hasLang(t, c);
+    return `<button role="menuitemradio" aria-checked="${c === lg}" data-lang="${c}" style="display:flex;align-items:center;justify-content:space-between;width:100%;border:none;background:${c === lg ? "#FDEBDD" : "none"};font-family:inherit;cursor:pointer;height:46px;padding:0 10px;border-radius:12px;font-size:16px;font-weight:${c === lg ? 700 : 600};color:#2A2233;text-align:left"><span>${n}${c === "en" ? "" : ` <span style="font-size:12.5px;color:#6B6375;font-weight:600">${LANG_NAME[c]}${missing ? " · not for this lesson yet" : ""}</span>`}</span>${c === lg ? "<span style=\"color:#4A2C5A\">✓</span>" : ""}</button>`; }).join("")
     + `<div style="font-size:12px;color:#6B6375;padding:6px 10px 4px;line-height:1.35">Lesson text, voice and doubts change. Buttons stay in English for now. More languages later.</div>`;
   ph.append(m); setTimeout(() => m.querySelector("[aria-checked=true]").focus(), 0); }
 const closeLangMenu = () => { const m = $("#langmenu"); if (m) m.remove(); };
@@ -1650,7 +1650,7 @@ function handle(t){
   if (t.dataset.lang) { const lg = t.dataset.lang; if ((S.lang || "en") === lg) return; stop(); S.lang = lg; Object.values(S.t).forEach(q => { q.sent = 0; }); save(); refresh();
     const x = T(), inLesson = PLAYER_FAMILY.concat(["Read", "Preview", "TalkCard", "Closing"]).includes(sc), n = TOPICS.filter(y => ready(y) && hasLang(y, lg)).length;
     if (lg === "en") return toast("Lessons in English.");
-    return toast(inLesson && x && ready(x) && !hasLang(x, lg) ? `This lesson's ${LANG_NAME[lg]} version is still being checked, so it stays in English for now. ${n} other lessons are ready in ${LANG_NAME[lg]}.` : `Lessons in ${LANG_NAME[lg]} (beta): ${n} ready. Buttons stay in English for now.`); }
+    return toast(inLesson && x && ready(x) && !hasLang(x, lg) ? `This lesson's ${LANG_NAME[lg]} version is still being checked, so it stays in English for now. ${n} other lessons are ready in ${LANG_NAME[lg]}.` : `Lessons in ${LANG_NAME[lg]}: ${n} ready. Buttons stay in English for now.`); }
   // ratings 1 to 5; tapping the chosen number again clears it
   if (t.dataset.rate) { const store = sc === "Closing" ? (p.lessonRating = p.lessonRating || {}) : p.debrief; const v = +t.dataset.n;
     if (store[t.dataset.rate] === v) delete store[t.dataset.rate]; else store[t.dataset.rate] = v;
@@ -1716,7 +1716,7 @@ function handle(t){
   // plan
   if (k === "See 2 other lines") { p.line = (p.line + 1) % L().first_lines.length; p.custom = null; save(); return refresh(); }
   if (k === "Edit line") { const f = $(`#s-${sc} [data-b=firstline]`); f.contentEditable = "true"; f.focus(); return toast("Type your own words, then tap Save my plan."); }
-  if (k === "Show in Telugu") { if (!hasLang(T(), "te")) return toast("The Telugu version of this lesson is still being prepared."); S.lang = "te"; save(); refresh(); return toast("Showing this lesson in Telugu (beta)."); }
+  if (k === "Show in Telugu") { if (!hasLang(T(), "te")) return toast("The Telugu version of this lesson is still being prepared."); S.lang = "te"; save(); refresh(); return toast("Showing this lesson in Telugu."); }
   if (k === "Show in English") { S.lang = "en"; save(); refresh(); return toast("Showing this lesson in English."); }
   if (t.getAttribute("role") === "switch") { const on = t.getAttribute("aria-checked") === "true";
     if (k.startsWith("Send a curiosity question") || k.startsWith("Warm up on WhatsApp")) return show(on ? "Ready" : "Spark");
@@ -1775,7 +1775,7 @@ function handle(t){
   if (k === "Call") { const n = (t.closest("div").parentElement.textContent.match(/1098|14416|1930/) || [""])[0]; return toast(`On a phone this calls ${n}. Raise does not record the call.`); }
   if (sc === "Language" && t.tagName === "BUTTON") { const lg = /Telugu|తెలుగు/.test(k) ? "te" : /Hindi|हिन्दी/.test(k) ? "hi" : /^English/.test(k) ? "en" : null;
     if (lg) { stop(); S.lang = lg; save(); refresh(); const n = TOPICS.filter(x => ready(x) && (lg === "en" || hasLang(x, lg))).length;
-      return toast(lg === "en" ? "Lessons in English." : `Lessons in ${LANG_NAME[lg]} (beta): ${n} ready. Others stay in English until their ${LANG_NAME[lg]} version is checked. Screens stay in English for now.`); } }
+      return toast(lg === "en" ? "Lessons in English." : `Lessons in ${LANG_NAME[lg]}: ${n} ready. Others stay in English until their ${LANG_NAME[lg]} version is checked. Screens stay in English for now.`); } }
   if (["Standard", "Large", "Extra large"].includes(k)) { S.textSize = k; choose(t); save(); return toast(`Text size: ${k}. Lesson text uses it.`); }
   if (sc === "Lens" && t.tagName === "BUTTON" && !k.startsWith("Not listed") && k !== "Close") { choose(t); S.lens = k; save(); refresh(); return toast(k === "None" ? "No thoughts added." : `Saved. A passage from ${k} appears once it is checked against the original.`); }
   if (k === "Not listed? Ask Raise to add someone") return toast("Request noted. A name is added only after its passages are checked.");
