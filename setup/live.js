@@ -121,6 +121,16 @@
       if (k === "Listen" || k === "Play" || k === "Pause") track("tap", { screen: sc, label: k });
       return false;
     },
+    // "Ask Raise to add this topic": stored for the topic finder
+    async request(q, lang) {
+      if (!sb) return false;
+      if (!session) await signInAnon();
+      if (!session) return false;
+      track("topic_request", { q: q.slice(0, 200) });
+      try { const r = await withTimeout(sb.from("topic_requests").insert({ query: q.slice(0, 300), lang, user_id: session.user.id }), 8000); return !r.error; } catch (e) { return false; }
+    },
+    // ratings (reflection useful / pushed, lesson useful) and shares, as usage events
+    rate(key, value, topic) { track("rating", { topic, key, value }); },
     async ask(q, t) {
       if (!sb) return null;
       track("doubt", { topic: t.slug, q: q.slice(0, 300) });
