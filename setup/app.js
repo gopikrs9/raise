@@ -253,7 +253,7 @@ function drawHome(sc){
   const planned = Object.entries(S.t).find(([s, p]) => p.stage === "planned");
   const nc = $("[data-b=nextcard]", sc);
   if (nc) { nc.style.display = planned ? "" : "none";
-    if (planned) { const [s, p] = planned, t = bySlug(s); $("[data-b=nextwhen]", sc).textContent = `Your next step · ${dayLabel(p.date).toLowerCase()}, ${p.place}`; $("[data-b=nextline]", sc).textContent = `"${LX(t).first_lines[p.line] || p.custom}"`; nc.dataset.topic = s; } }
+    if (planned) { const [s, p] = planned, t = bySlug(s); $("[data-b=nextwhen]", sc).textContent = `Your next step · ${dayLabel(p.date).toLowerCase()}, ${p.place}`; $("[data-b=nextline]", sc).textContent = ready(t) ? `"${p.custom || LX(t).first_lines[p.line]}"` : ""; nc.dataset.topic = s; } }
   const mc = $("[data-b=minicard]", sc), started = Object.entries(S.t).find(([s, p]) => p.stage === "listening");
   if (mc) { mc.style.display = started ? "" : "none"; if (started) { const t = bySlug(started[0]); $("[data-b=minititle]", sc).textContent = S.discreet ? t.category : (t.short || t.title); $("[data-b=mini]", sc).textContent = `Chapter ${started[1].ch + 1} of ${t.lesson.chapters.length} · ${playing ? "playing" : "paused"}`; mc.dataset.topic = started[0]; } }
 }
@@ -303,8 +303,9 @@ function drawMyTopics(sc){
   mine.filter(x => x !== top).forEach(([s, p]) => { const t = bySlug(s);
     const [tpl, sub] = p.stage === "planned" ? [TPL.myTalk, `Next: talk ${dayLabel(p.date).toLowerCase()}`] : p.stage === "listening" ? [TPL.myCont, `Next: finish listening · chapter ${p.ch + 1} of ${t.lesson.chapters.length}`]
       : p.stage === "heard" ? [TPL.myTalk, "Next: plan your talk"] : p.stage === "done" ? [TPL.myDone, `Done · talked ${dayLabel(p.talked || today)}`] : [TPL.mySaved, ready(t) ? "Saved · not started" : "Saved · lesson coming soon"];
-    const n = clone(tpl); n.dataset.topic = s; fillRow(n, t, sub); const b = n.querySelector("button"); if (b && tpl === TPL.myTalk) b.textContent = p.stage === "heard" ? "Plan talk" : "Talk card"; list.append(n); });
+    const n = clone(tpl); n.dataset.topic = s; fillRow(n, t, sub); const b = n.querySelector("button"); if (b && tpl === TPL.myTalk) b.textContent = p.stage === "heard" ? "Plan talk" : "Talk plan"; list.append(n); });
   if (!mine.length) list.innerHTML = `<div style="padding:20px 4px;color:#6B6375;font-size:15px">Nothing here yet.</div>`;
+  $$("button, a", sc).forEach(b => { $$("*", b).concat([b]).filter(e => !e.children.length && e.textContent.trim() === "Talk card").forEach(e => e.textContent = "Talk plan"); });
 }
 function fillRow(n, t, sub){ const sq = n.querySelector("div div") || n.querySelector("div"); const ic = $$("div", n).find(d => (d.getAttribute("style") || "").includes("width: 56px")); if (ic) paint(ic, t, ICON_TALK.replace('width="56" height="56"', 'width="30" height="30"'));
   const tx = $$("div", n).filter(d => !d.children.length && d.textContent.trim()); if (tx[0]) tx[0].textContent = S.discreet ? t.category : (t.short || t.title); if (tx[1]) tx[1].textContent = sub; }
@@ -431,6 +432,19 @@ function drawTalk(sc){
   const db = $("[data-b=dbsub]"); if (db) db.textContent = `${t.short || t.title} · planned for ${dayLabel(p.date).toLowerCase()}`;
   const gp = $("[data-b=gatep]"); if (gp) gp.innerHTML = `You planned to talk about <strong>${esc((t.short || t.title).toLowerCase())}</strong> ${p.date === today ? "tonight" : "on " + dayLabel(p.date)}. Did you get to it?`;
 }
+function drawTalkPlan(sc){
+  const t = T(), p = P(); if (!ready(t)) return; const planned = p.stage === "planned", d0 = p.date || today;
+  $("[data-b=tptopic]", sc).textContent = (S.discreet ? t.category : (t.short || t.title)) + (planned ? ` · ${dayLabel(p.date)}, ${p.place}` : " · not planned yet");
+  const chip = on => (on ? TPL.chipOn : TPL.chipOff) + ";flex:0 0 auto;scroll-snap-align:start";
+  $("[data-b=tpdays]", sc).innerHTML = Array.from({ length: 7 }, (_, i) => { const d = addDays(i), v = iso(d), n = i === 0 ? "Today" : i === 1 ? "Tomorrow" : `${DAY[d.getDay()]} ${d.getDate()}`; return `<button data-tpday="${v}" aria-label="Day: ${n}" style="${chip(v === d0)}">${n}</button>`; }).join("");
+  $("[data-b=tpplaces]", sc).innerHTML = ["after school", "after dinner", "on a walk", "on a phone call"].map(x => `<button data-tpplace="${x}" aria-label="Place: ${x}" style="${chip(x === p.place)}">${x[0].toUpperCase() + x.slice(1)}</button>`).join("");
+  $("[data-b=tpremind]", sc).textContent = `🔔 Reminder ${dayLabel(d0).replace("Tonight", "today")} at 7:30 pm · shows as "Evening walk"`;
+  const box = $("[data-b=wabox]", sc); if (box) box.style.display = p.waOpen ? "" : "none"; const ch = $("[data-b=wachev]", sc); if (ch) ch.textContent = p.waOpen ? "⌃" : "⌄";
+  const sv = $("[data-act=tpsave]", sc), tk = $("[data-act=tptalked]", sc), nt = $("[data-act=tpnot]", sc);
+  if (sv) sv.style.display = planned ? "none" : "";
+  if (tk) { if (!tk.dataset.full) tk.dataset.full = tk.getAttribute("style"); tk.setAttribute("style", planned ? tk.dataset.full : nt ? nt.getAttribute("style") : tk.dataset.full); tk.textContent = planned ? "We talked" : "We already talked"; }
+  if (nt) nt.style.display = planned ? "" : "none";
+}
 function drawClosing(sc){
   const t = T(); if (!ready(t)) return; const ul = $("[data-b=srclist]", sc);
   ul.innerHTML = ""; t.lesson.sources.forEach(s => { const li = clone(TPL.src), sp = li.querySelectorAll("span"); sp[0].textContent = (s.publisher || "").slice(0, 48); sp[1].innerHTML = `<a href="${esc(s.url)}" target="_blank" rel="noopener" style="color:inherit">${esc(s.title)} · ${s.year}</a>`; ul.append(li); });
@@ -465,6 +479,7 @@ function fill(sc){
   if (id === "Closing") drawClosing(sc);
   if (["Player", "Read", "Parts", "Doubt", "Boundary", "Ready", "PickDay", "Spark", "PlanSaved"].includes(id)) drawPlayer(sc);
   if (["TalkCard", "Debrief", "Gate", "PlanSaved", "TopicDetail"].includes(id)) drawTalk(sc);
+  if (id === "TalkCard") { drawPlayer(sc); drawTalkPlan(sc); }
 }
 
 /* ---------------- navigation ---------------- */
@@ -481,6 +496,7 @@ function show(id, push = true){
   if (location.hash.slice(1) !== id) history.replaceState(null, "", "#" + id);
   fitScroll(sc, true);
   if (H.view) H.view(id, S.cur);
+  if (id === "TalkCard" && !S.seenPlan) { S.seenPlan = true; save(); setTimeout(() => toast("Your talk plan: what to say, when, a WhatsApp warm-up, and what to do if it goes wrong. All in one place."), 400); }
 }
 const back = fb => { const p = hist.pop(); show(p || fb || "Home", false); };
 const refresh = () => { const s = scr(cur); if (s) { fill(s); fitScroll(s, false); } };
@@ -558,11 +574,11 @@ const GO = {
   Home: { "Help": "Help", "Not today": "NotYet" }, Offline: { "Help": "Help", "Not today": "NotYet" },
   Gate: { "Close": "Home", "Ask me later": "Home", "Yes, tell Raise how it went": "Debrief", "Not yet, move it": "NotYet" },
   SearchBoundary: {}, Preview: { "Close": "Home" },
-  Player: { "Minimise": "Home", "Ask a doubt": "Doubt", "I am ready to talk": "Ready" }, Read: { "Minimise": "Home", "Ask a doubt": "Doubt", "I am ready to talk": "Ready" },
-  Closing: { "Minimise": "Home", "I am ready to talk": "Ready", "Not now": "Home" },
+  Player: { "Minimise": "Home", "Ask a doubt": "Doubt", "I am ready to talk": "TalkCard" }, Read: { "Minimise": "Home", "Ask a doubt": "Doubt", "I am ready to talk": "TalkCard" },
+  Closing: { "Minimise": "Home", "I am ready to talk": "TalkCard", "Not now": "Home" },
   Ready: { "Pick a day": "PickDay" }, Spark: { "Pick a day": "PickDay" }, PickDay: {},
   PlanSaved: { "Close": "MyTopics", "Done": "MyTopics", "Undo": "Ready" },
-  TopicDetail: { "Open talk card": "TalkCard", "Change plan": "Ready", "We talked": "Debrief" }, TopicsEmpty: { "Find a topic": "Home" },
+  TopicDetail: { "Open talk card": "TalkCard", "Open talk plan": "TalkCard", "Change plan": "TalkCard", "We talked": "Debrief" }, TopicsEmpty: { "Find a topic": "Home" },
   TalkCard: { "We talked": "Debrief", "Not today": "NotYet" },
   Debrief: { "Close": "MyTopics", "We have not talked yet": "NotYet" },
   NotYet: { "Close": "TalkCard" }, Reflection: { "Close": "MyTopics", "Later": "MyTopics" },
@@ -614,7 +630,7 @@ function handle(t){
   if (t.dataset.see) { S.seeCat = t.dataset.see; return show("SeeAll"); }
   if (t.dataset.browse) { const i = $("#s-Search input"); i.value = t.dataset.browse; return refresh(); }
   if (t.dataset.topic && (t.tagName === "A" || (t.tagName !== "BUTTON" && sc !== "MyTopics"))) return openTopic(t.dataset.topic);
-  if (k === "Open talk card") { const nc = t.closest("[data-topic]"); if (nc) S.cur = nc.dataset.topic; return show("TalkCard"); }
+  if (k === "Open talk card" || k === "Open talk plan") { const nc = t.closest("[data-topic]"); if (nc) S.cur = nc.dataset.topic; return show("TalkCard"); }
   if (k === "Play" && ["Home", "Offline", "Gate", "Preview"].includes(sc)) { const mc = t.closest("[data-topic]"); if (mc) S.cur = mc.dataset.topic; return show("Player"); }
   if (k === "Clear search") { $(`#s-${sc} input`).value = ""; if (sc === "SearchBoundary") return show("Search"); return refresh(); }
   if (k === "Ask Raise to add this topic") { const q = (($(`#s-${sc} input`) || {}).value || "").trim();
@@ -647,7 +663,7 @@ function handle(t){
   if (sc === "Doubt" && PRESET[k]) { answer(PRESET[k]); $("[data-b=dq]").textContent = k; return; }
   if (k === "Go to: How to begin") { goChapter(5); return show("Player"); }
   if (k === "Get help") return show("Help");
-  if (k === "I am ready to talk") { stop(); return show("Ready"); }
+  if (k === "I am ready to talk") { stop(); return show("TalkCard"); }
 
   // plan
   if (k === "See 2 other lines") { p.line = (p.line + 1) % L().first_lines.length; p.custom = null; save(); return refresh(); }
@@ -668,6 +684,14 @@ function handle(t){
     if (!msg) return toast("Write your message first, or pick a question.");
     window.open("https://wa.me/?text=" + encodeURIComponent(msg), "_blank", "noopener"); p.sparkSent = today; save(); if (H.rate) H.rate("spark_sent", 1, S.cur);
     return toast("WhatsApp opens with your message. Pick your teen's chat. Nothing about Raise is included."); }
+  if (t.dataset.tpday) { p.date = t.dataset.tpday; save(); refresh(); return toast(`${dayLabel(p.date).replace("Tonight", "Today")}, ${p.place}.${p.stage === "planned" ? " Plan updated." : ""}`); }
+  if (t.dataset.tpplace) { p.place = t.dataset.tpplace; save(); return refresh(); }
+  if (t.dataset.act === "watoggle") { p.waOpen = !p.waOpen; save(); return refresh(); }
+  if (t.dataset.act === "tpclose") return back("MyTopics");
+  if (t.dataset.act === "tpsave") { const f = $(`#s-${sc} [data-b=flrow] [contenteditable=true]`); if (f) { f.contentEditable = "false"; const v = f.textContent.replace(/^["“]|["”]$/g, "").trim(); if (v && v !== noCite(L().first_lines[p.line])) p.custom = v; }
+    p.date = p.date || today; p.stage = "planned"; S.gateFor = S.cur; save(); refresh(); return toast(`Plan saved: ${dayLabel(p.date).replace("Tonight", "today")}, ${p.place}. Reminder at 7:30 pm. It waits in My topics.`); }
+  if (t.dataset.act === "tptalked") return show("Debrief");
+  if (t.dataset.act === "tpnot") return show("NotYet");
   if (t.dataset.act === "celopen") { const c = $("#celebrate"); if (c) c.remove(); return openTopic(t.dataset.slug); }
   if (t.dataset.act === "celclose") { const c = $("#celebrate"); if (c) c.remove(); return; }
   if (["After school", "After dinner", "On a walk", "On a phone call"].includes(k)) { p.place = k.toLowerCase(); choose(t); save(); return; }
@@ -681,14 +705,14 @@ function handle(t){
   if (t.dataset.day) { const has = myTopics().find(([s, q]) => q.date === t.dataset.day && q.stage === "planned"); $$("button", t.parentElement).forEach(b => b.setAttribute("style", b === t ? TPL.dayOn : TPL.dayOff)); return toast(has ? `${dayLabel(t.dataset.day)}: talk about ${(bySlug(has[0]).short || bySlug(has[0]).title).toLowerCase()}` : `${dayLabel(t.dataset.day)}: no talk planned.`); }
   if (sc === "MyTopics" && ["All", "To talk", "To finish", "Done", "Saved"].includes(k)) { S.myFilter = k; save(); return refresh(); }
   if (sc === "MyTopics") { const row = t.closest("[data-topic]"); if (row) { S.cur = row.dataset.topic; const q = P(); save();
-      if (k === "Talk card") return show("TalkCard"); if (k === "Plan talk") return show("Ready"); if (k === "Continue lesson") return show("Player"); if (k === "Tell Raise") return show("Debrief"); return show("TopicDetail"); } }
+      if (["Talk card", "Talk plan", "Plan talk"].includes(k)) return show("TalkCard"); if (k === "Continue lesson") return show("Player"); if (k === "Tell Raise") return show("Debrief"); return show("TopicDetail"); } }
   if (k === "Listen again") { goChapter(0); return show("Player"); }
   if (k === "Remove from My topics") { p.stage = "removed"; save(); toast("Removed. You can find it again on Home."); return show("MyTopics"); }
   if (sc === "Debrief" && t.tagName === "BUTTON" && !["Close", "See my reflection", "We have not talked yet"].includes(k)) { choose(t); const grp = t.parentElement.previousElementSibling ? t.parentElement.previousElementSibling.textContent : ""; const key = grp.includes("long") ? "len" : grp.includes("respond") ? "resp" : "feel"; p.debrief[key] = k; save(); return; }
   if (k === "See my reflection") { p.debrief.said = ($("#s-Debrief textarea").value || "").trim(); p.stage = "done"; p.talked = today; p.tries = (p.tries || 0) + 1;
     p.log = p.log || []; p.log.push({ date: today, len: p.debrief.len || null, resp: p.debrief.resp || null, feel: p.debrief.feel || null, said: p.debrief.said || "" });
     delete p.debrief.useful; delete p.debrief.pushed; $("#s-Debrief textarea").value = ""; save(); return show("Reflection"); }
-  if (t.dataset.act === "secondtry") { p.stage = "heard"; p.line = (p.line + 1) % 3; if (L().second_try) p.custom = L().second_try.new_way_in; p.date = iso(addDays(2)); save(); toast("A second try, two days from now. You can change the day."); return show("Ready"); }
+  if (t.dataset.act === "secondtry") { p.stage = "heard"; p.line = (p.line + 1) % 3; if (L().second_try) p.custom = L().second_try.new_way_in; p.date = iso(addDays(2)); save(); toast("A second try, two days from now. You can change the day."); return show("TalkCard"); }
   if (sc === "Reflection" && ["Yes", "No"].includes(k)) { choose(t); return toast("Thank you. This shapes your next reflection."); }
   if (sc === "Reflection" && k === "Open") { const c = t.closest("[data-topic]"); if (c) return openTopic(c.dataset.topic); return show("Home"); }
   if (sc === "NotYet" && ["Later today", "Tomorrow", "Pick a day"].includes(k)) { choose(t); if (k === "Pick a day") return show("PickDay"); p.date = iso(addDays(k === "Tomorrow" ? 1 : 0)); save(); return; }
@@ -823,6 +847,31 @@ function upgrade(){
     const sw2 = startsText(scr("TalkCard"), "Start with"); if (sw2 && !sw2.children.length) sw2.textContent = "💬 Start with"; }
   // 10. lines to say in the lesson look like chat bubbles
   ["Player", "Read", "Parts", "Doubt", "Boundary", "Ready", "Spark", "PickDay", "PlanSaved"].forEach(id => { const sc = scr(id); if (!sc) return; $$("[data-b=line]", sc).forEach(l => { const box = l.closest("div[style*='border-radius']"); if (box) box.classList.add("say"); const lab = l.previousElementSibling; if (lab && lab.textContent.trim() === "You could say") lab.textContent = "💬 You could say"; }); });
+  // 12. ONE talk plan, opened from everywhere: what to say, when, WhatsApp warm-up, tips, and the outcome
+  const tcS = scr("TalkCard"), tfl = tcS && $("[data-b=firstline]", tcS); if (tfl) { const col = tfl.parentElement; col.style.paddingTop = "20px";
+    const hd = document.createElement("div"); hd.setAttribute("style", "display:flex;align-items:center;justify-content:space-between;gap:8px");
+    hd.innerHTML = `<div style="min-width:0"><h1 style="margin:0;font-size:22px;font-weight:700">Your talk plan</h1><div data-b="tptopic" style="font-size:14px;color:#6B6375;margin-top:2px"></div></div><button aria-label="Close" data-act="tpclose" style="border:none;background:#F3EEE8;width:44px;height:44px;border-radius:22px;cursor:pointer;font-size:24px;line-height:1;color:#2A2233;flex:none">×</button>`;
+    col.prepend(hd); $("[data-b=when]", tcS).style.display = "none";
+    tfl.style.display = "none"; tfl.classList.remove("say"); const lab = tfl.previousElementSibling; if (lab) { lab.textContent = "💬 What to say"; lab.style.marginTop = "14px"; }
+    const row = document.createElement("div"); row.className = "fl-row"; row.dataset.b = "flrow"; tfl.after(row);
+    const tools = document.createElement("div"); tools.setAttribute("style", "flex-shrink:0;display:flex;justify-content:space-between;align-items:center;font-size:13px;color:#6B6375;margin:-6px 2px 0");
+    tools.innerHTML = `<span>Swipe to see all 3 lines</span><button data-act="editline" style="border:none;background:none;font:700 14px var(--font);color:#4A2C5A;cursor:pointer;height:36px">✎ Use my own words</button>`; row.after(tools);
+    const when = document.createElement("div"); when.setAttribute("style", "flex-shrink:0");
+    when.innerHTML = `<div style="font-size:14px;font-weight:700;color:#4A2C5A;margin-top:8px">📅 When</div><div data-b="tpdays" class="fl-row" style="gap:8px;padding:6px 2px 4px"></div><div data-b="tpplaces" class="fl-row" style="gap:8px;padding:2px 2px 4px"></div><div data-b="tpremind" style="font-size:13.5px;color:#6B6375;margin:0 2px"></div>`;
+    tools.after(when);
+    const wa = document.createElement("div"); wa.setAttribute("style", "flex-shrink:0;margin-top:12px");
+    wa.innerHTML = `<button data-act="watoggle" aria-label="Warm up on WhatsApp first" style="border:none;font-family:inherit;cursor:pointer;width:100%;display:flex;align-items:center;gap:10px;text-align:left;background:#E8F8EE;border-radius:16px;padding:10px 12px;color:#2A2233">${WA_ICON}<span style="flex:1"><span style="display:block;font-size:15.5px;font-weight:700">Warm up on WhatsApp first</span><span style="display:block;font-size:13px;color:#3D6B4E">Send your teen a light question before you talk</span></span><span data-b="wachev" style="font-size:20px;color:#14743A">⌄</span></button>
+      <div data-b="wabox" class="wa-card" style="display:none"><div data-b="sparks"></div><button class="wa-btn" data-act="wasend">${WA_ICON.replace(/#1FA855/g, "#FFFFFF")}Send on WhatsApp</button></div>`;
+    when.after(wa);
+    const keep = startsText(tcS, "Keep in mind"), keepBox = keep && keep.parentElement, whyBox = $("[data-b=tcwhyhead]", tcS) && $("[data-b=tcwhyhead]", tcS).parentElement;
+    const det = document.createElement("details"); det.setAttribute("style", "flex-shrink:0;margin-top:12px;background:#FFFFFF;border-radius:18px;padding:0 14px;box-shadow:inset 0 0 0 1px #EFE6DA");
+    det.innerHTML = `<summary style="cursor:pointer;font-size:15px;font-weight:700;color:#4A2C5A;min-height:48px;display:flex;align-items:center;justify-content:space-between">💡 Tips, and what to do if it goes wrong <span aria-hidden="true">⌄</span></summary>`;
+    wa.after(det); [keepBox, whyBox].forEach(b => { if (b) { b.style.marginTop = "0"; b.style.marginBottom = "12px"; det.append(b); } });
+    const talked = $$("button", tcS).find(b => label(b) === "We talked"); if (talked) { const sv = document.createElement("button"); sv.dataset.act = "tpsave"; sv.textContent = "Save my plan"; sv.setAttribute("style", talked.getAttribute("style")); talked.before(sv); talked.dataset.act = "tptalked"; }
+    const nt = $$("button", tcS).find(b => label(b) === "Not today"); if (nt) nt.dataset.act = "tpnot";
+    if (talked) talked.parentElement.style.marginTop = "16px"; }
+  // "Talk card" is now "Talk plan" everywhere
+  $$(".screen button, .screen a").forEach(b => { if (label(b) === "Open talk card") { const leaf = $$("*", b).filter(e => !e.children.length && e.textContent.trim() === "Open talk card").pop(); (leaf || b).textContent = "Open talk plan"; } });
   // 11. after "We talked", there is no "we have not talked yet"
   const dbq = scr("Debrief") && $$("button", scr("Debrief")).find(b => label(b) === "We have not talked yet"); if (dbq) dbq.style.display = "none";
   // 6. say what discreet mode is for
