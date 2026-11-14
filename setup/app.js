@@ -31,7 +31,7 @@ function LX(t){
     first_lines: Array.isArray(tr.first_lines) && tr.first_lines.length === 3 ? tr.first_lines : b.first_lines,
     talk_card: Object.assign({}, b.talk_card || {}, tr.talk_card || {}), say: (tr.talk_card && (tr.talk_card.ask || tr.talk_card.open)) || b.say,
     second_try: tr.second_try ? Object.assign({}, b.second_try || {}, tr.second_try) : b.second_try, sparks: Array.isArray(tr.sparks) && tr.sparks.length ? tr.sparks : b.sparks,
-    audio: [], lang: lg });
+    audio: [], lang: lg, title: tr.title || t.title });
 }
 const L = () => LX(T());
 let playing = false;
@@ -49,6 +49,29 @@ function langBar(){ const d = document.createElement("div"); d.dataset.b = "lang
   d.setAttribute("style", "display:flex;align-items:center;gap:6px;margin:10px 0 6px;flex-wrap:wrap");
   d.innerHTML = `<span style="font-size:13px;font-weight:700;color:#6B6375;margin-right:4px">Lesson language</span>` + LANGS.map(([k, n]) => `<button data-lang="${k}" aria-label="${n === "English" ? "English" : n + " (" + LANG_NAME[k] + ")"}" style="${LB_OFF}">${n}</button>`).join("");
   return d; }
+const GLOBE = '<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg>';
+const SHORT_LANG = { en: "EN", te: "తె", hi: "हि" };
+function langBtn(kind){ const b = document.createElement("button"); b.dataset.act = "langmenu"; b.dataset.langlabel = kind; b.setAttribute("aria-label", "Lesson language");
+  b.setAttribute("style", kind === "col" ? "border:none;font-family:inherit;cursor:pointer;background:none;color:#6B6375;display:flex;flex-direction:column;align-items:center;font-size:14px;font-weight:600;width:52px;height:48px;justify-content:center;gap:1px"
+    : "border:none;font-family:inherit;cursor:pointer;background:#FFFFFF;color:#4A2C5A;display:flex;align-items:center;gap:4px;height:36px;padding:0 10px;border-radius:18px;font-size:14px;font-weight:700;box-shadow:inset 0 0 0 1px #E8DFD3");
+  return b; }
+function drawLangBtns(sc){ const lg = S.lang || "en";
+  $$("[data-act=langmenu]", sc).forEach(b => { const k = b.dataset.langlabel;
+    if (k === "full") b.textContent = { en: "English", te: "తెలుగు", hi: "हिन्दी" }[lg];
+    else if (k === "col") b.innerHTML = `${GLOBE}<span>${SHORT_LANG[lg]}</span>`;
+    else b.innerHTML = `${GLOBE.replace(/22/g, "18")}<span>${SHORT_LANG[lg]}</span>`; }); }
+function openLangMenu(from){
+  closeLangMenu(); const ph = $("#phone"), r = from.getBoundingClientRect(), pr = ph.getBoundingClientRect(), k = pr.width / 390;
+  const m = document.createElement("div"); m.id = "langmenu"; m.setAttribute("role", "menu");
+  m.setAttribute("style", `position:absolute;z-index:60;right:${Math.max(12, (pr.right - r.right) / k)}px;top:${(r.bottom - pr.top) / k + 6}px;width:230px;background:#FFFFFF;border-radius:18px;box-shadow:0 12px 32px rgba(42,34,51,.22);padding:8px`);
+  const t = T(), lg = S.lang || "en";
+  m.innerHTML = `<div style="font-size:12.5px;font-weight:700;color:#6B6375;padding:6px 10px 4px">Lesson language</div>` + LANGS.map(([c, n]) => {
+    const missing = c !== "en" && t && ready(t) && !hasLang(t, c);
+    return `<button role="menuitemradio" aria-checked="${c === lg}" data-lang="${c}" style="display:flex;align-items:center;justify-content:space-between;width:100%;border:none;background:${c === lg ? "#FDEBDD" : "none"};font-family:inherit;cursor:pointer;height:46px;padding:0 10px;border-radius:12px;font-size:16px;font-weight:${c === lg ? 700 : 600};color:#2A2233;text-align:left"><span>${n}${c === "en" ? "" : ` <span style="font-size:12.5px;color:#6B6375;font-weight:600">${LANG_NAME[c]} · beta${missing ? " · not for this lesson yet" : ""}</span>`}</span>${c === lg ? "<span style=\"color:#4A2C5A\">✓</span>" : ""}</button>`; }).join("")
+    + `<div style="font-size:12px;color:#6B6375;padding:6px 10px 4px;line-height:1.35">Lesson text, voice and doubts change. Buttons stay in English for now. More languages later.</div>`;
+  ph.append(m); setTimeout(() => m.querySelector("[aria-checked=true]").focus(), 0); }
+const closeLangMenu = () => { const m = $("#langmenu"); if (m) m.remove(); };
+
 /* ratings 1 to 5, tap again to clear */
 const RT_ON = "border:none;font-family:inherit;cursor:pointer;width:34px;height:34px;border-radius:17px;font-size:15px;font-weight:700;background:#4A2C5A;color:#FFFFFF;flex:0 0 auto";
 const RT_OFF = "border:none;font-family:inherit;cursor:pointer;width:34px;height:34px;border-radius:17px;font-size:15px;font-weight:700;background:#F3EEE8;color:#4A2C5A;flex:0 0 auto";
@@ -234,7 +257,7 @@ function drawHome(sc){
   if (mc) { mc.style.display = started ? "" : "none"; if (started) { const t = bySlug(started[0]); $("[data-b=minititle]", sc).textContent = S.discreet ? t.category : (t.short || t.title); $("[data-b=mini]", sc).textContent = `Chapter ${started[1].ch + 1} of ${t.lesson.chapters.length} · ${playing ? "playing" : "paused"}`; mc.dataset.topic = started[0]; } }
 }
 function drawPreview(sc){
-  const t = T(), title = $("[data-b=pvtitle]", sc); if (!title) return; title.textContent = t.title;
+  const t = T(), title = $("[data-b=pvtitle]", sc); if (!title) return; title.textContent = (ready(t) && LX(t).title) || t.title;
   if (TPL.pvIcon) { if (!TPL.pvIconHtml) TPL.pvIconHtml = TPL.pvIcon.innerHTML; paint(TPL.pvIcon, t, TPL.pvIconHtml); }
   const list = $("[data-b=pvlist]", sc), li = list.children[0];
   const items = ready(t) ? [t.lesson.chapters[2].title, "Three ways to begin, word for word", "How they may react, and what you can say"]
@@ -398,7 +421,7 @@ function drawLang(sc, id){
   }
 }
 function fill(sc){
-  drawCommon(sc); const id = sc.id.slice(2); drawLang(sc, id);
+  drawCommon(sc); const id = sc.id.slice(2); drawLang(sc, id); drawLangBtns(sc);
   if (["Home", "Offline", "Gate", "Preview"].includes(id)) drawHome(sc);
   if (id === "Preview") drawPreview(sc);
   if (id === "SeeAll") drawSeeAll(sc);
@@ -416,7 +439,7 @@ function fill(sc){
 /* ---------------- navigation ---------------- */
 const hist = []; let cur = null;
 function show(id, push = true){
-  if (!scr(id)) return;
+  if (!scr(id)) return; closeLangMenu();
   if (id === "MyTopics" && !myTopics().length) id = "TopicsEmpty";
   if (id === "Home" && S.gateFor && S.t[S.gateFor] && S.t[S.gateFor].stage === "planned") { S.cur = S.gateFor; S.gateFor = null; save(); id = "Gate"; }
   if (["Player", "Read", "Parts", "Ready", "PickDay", "Spark", "Closing", "TalkCard"].includes(id) && !ready(T())) { toast("This lesson is still being written."); return; }
@@ -531,7 +554,9 @@ function handle(t){
   if (SHEETS_OVER_ME.includes(sc) && k === "Close") return back("Me");
   // lesson language, from any lesson screen
   if (t.dataset.lang) { const lg = t.dataset.lang; if ((S.lang || "en") === lg) return; stop(); S.lang = lg; Object.values(S.t).forEach(q => { q.sent = 0; }); save(); refresh();
-    const x = T(); return toast(lg === "en" ? "Lessons in English." : x && ready(x) && !hasLang(x, lg) ? `${LANG_NAME[lg]} chosen. This lesson's ${LANG_NAME[lg]} version is still being checked, so it stays in English for now.` : `Lessons in ${LANG_NAME[lg]} (beta). Buttons stay in English for now.`); }
+    const x = T(), inLesson = PLAYER_FAMILY.concat(["Read", "Preview", "TalkCard", "Closing"]).includes(sc), n = TOPICS.filter(y => ready(y) && hasLang(y, lg)).length;
+    if (lg === "en") return toast("Lessons in English.");
+    return toast(inLesson && x && ready(x) && !hasLang(x, lg) ? `This lesson's ${LANG_NAME[lg]} version is still being checked, so it stays in English for now. ${n} other lessons are ready in ${LANG_NAME[lg]}.` : `Lessons in ${LANG_NAME[lg]} (beta): ${n} ready. Buttons stay in English for now.`); }
   // ratings 1 to 5; tapping the chosen number again clears it
   if (t.dataset.rate) { const store = sc === "Closing" ? (p.lessonRating = p.lessonRating || {}) : p.debrief; const v = +t.dataset.n;
     if (store[t.dataset.rate] === v) delete store[t.dataset.rate]; else store[t.dataset.rate] = v;
@@ -680,8 +705,11 @@ function dictate(m){
 
 document.addEventListener("click", e => {
   const mic = e.target.closest("#phone [data-mic]"); if (mic) { e.preventDefault(); return dictate(mic); }
+  const lm = e.target.closest("#phone [data-act=langmenu]"); if (lm) { e.preventDefault(); return $("#langmenu") ? closeLangMenu() : openLangMenu(lm); }
+  const li = e.target.closest("#langmenu [data-lang]"); if (li) { e.preventDefault(); closeLangMenu(); return handle(li); }
+  if ($("#langmenu") && !e.target.closest("#langmenu")) { closeLangMenu(); e.preventDefault(); return; }
   const j = e.target.closest("[data-jump]"); if (j) { stop(); hist.length = 0; return show(j.dataset.jump); }
-  const t = e.target.closest("#phone button, #phone a, #phone [data-overlay], #phone [data-topic]"); if (!t) return;
+  const t = e.target.closest("#phone .screen button, #phone .screen a, #phone [data-overlay], #phone [data-topic]"); if (!t) return;
   if (t.tagName === "A" && t.getAttribute("target") === "_blank") return;
   e.preventDefault(); handle(t);
 });
@@ -710,12 +738,13 @@ function upgrade(){
     if (m && m.tagName === "SPAN" && m.querySelector("svg")) { m.dataset.mic = "1"; m.setAttribute("role", "button"); m.setAttribute("aria-label", "Speak instead of typing"); m.setAttribute("tabindex", "0"); m.style.cursor = "pointer"; } }));
   // 2. Save for later shows its state
   $$("button", scr("Preview")).filter(b => label(b) === "Save for later").forEach(b => b.dataset.act = "savelater");
-  // 3. lesson language on every lesson screen
-  const topChild = (sc, el) => { const root = sc.firstElementChild; let x = el; while (x && x.parentElement !== root) x = x.parentElement; return x; };
-  const lb = scr("Preview") && byText(scr("Preview"), "Listen", "button"); if (lb) lb.before(langBar());
-  ["Player", "Read"].forEach(id => { const sc = scr(id), tab = sc && byText(sc, "Read", "button"); const top = tab && topChild(sc, tab); if (top) top.after(langBar()); });
-  ["Ready", "Spark"].forEach(id => { const sc = scr(id), ed = sc && $$("button", sc).filter(b => label(b) === "Edit line").pop(); if (ed) ed.parentElement.after(langBar()); });
-  const tcs = scr("TalkCard"), sw = tcs && startsText(tcs, "Start with"); if (sw) sw.before(langBar());
+  // 3. one small language button (opens a short list): Home next to Help, the lesson top bar, and the first screen
+  ["Home", "Offline", "Gate", "Preview"].forEach(id => { const sc = scr(id); if (!sc) return; const help = $$("button", sc).find(b => label(b) === "Help"); if (!help || help.parentElement.dataset.langwrap) return;
+    const wrap = document.createElement("div"); wrap.dataset.langwrap = "1"; wrap.setAttribute("style", "display:flex;align-items:center;gap:2px"); help.before(wrap); wrap.append(langBtn("col"), help); });
+  ["Player", "Read", "Parts", "Doubt", "Boundary", "Ready", "Spark", "PickDay", "PlanSaved"].forEach(id => { const sc = scr(id), mn = sc && $("[aria-label=Minimise]", sc); if (!mn) return;
+    const spacer = [...mn.parentElement.children].find(k => k.tagName === "DIV" && /width:\s*36px/.test(k.getAttribute("style") || "") && !k.children.length); const b = langBtn("pill"); if (spacer) spacer.replaceWith(b); else mn.parentElement.append(b); });
+  const mainLang = scr("Main") && $$("button", scr("Main")).find(b => label(b) === "English"); if (mainLang) { mainLang.dataset.act = "langmenu"; mainLang.dataset.langlabel = "full"; }
+  const gfLang = scr("GoogleFail") && $$("button", scr("GoogleFail")).find(b => label(b) === "English"); if (gfLang) { gfLang.dataset.act = "langmenu"; gfLang.dataset.langlabel = "full"; }
   // 4. "Was this useful?" and "Did you feel pushed?" become 1 to 5 scales that can be cleared
   [["Reflection", ["useful", "pushed"]], ["Closing", ["useful"]]].forEach(([id, keys]) => { const sc = scr(id); if (!sc) return; let i = 0;
     $$("button", sc).filter(b => label(b) === "Yes" && b.nextElementSibling && label(b.nextElementSibling) === "No").forEach(y => { const key = keys[i++]; if (!key) return; const box = y.parentElement;
@@ -732,6 +761,9 @@ function upgrade(){
     // goes under any sheet or dim layer on the screen, so sheets still cover it
     const root = sc.firstElementChild, firstPinned = [...root.children].find(k => /position:\s*(absolute|fixed)/.test(k.getAttribute("style") || ""));
     root.insertBefore(src.cloneNode(true), firstPinned || null); sc.dataset.navAdded = "1"; });
+  // reflection: "Next for you" before the ratings, so it is seen without scrolling; one scale caption
+  const rf = scr("Reflection"); if (rf) { const nx = $$("div", rf).find(e => !e.children.length && e.textContent.trim() === "Next for you"); const rt = $("[data-rate]", rf);
+    if (nx && rt) { const box = nx.parentElement, block = [...box.children].find(k => k.contains(rt)); if (block) box.append(block); const caps = $$("div", block || rf).filter(d => /^1 = not at all/.test(d.textContent)); caps.slice(0, -1).forEach(c => c.remove()); } }
   // 6. say what discreet mode is for
   const ds = scr("Discreet"), dl = ds && startsText(ds, "For a shared phone"); if (dl) dl.textContent = "For shared phones. When it is on, Raise shows only general categories like \"Feelings\" instead of lesson titles and pictures, and reminders use your own neutral words like \"Evening walk\". Anyone glancing at your phone, including your teen, will not see what you are preparing for.";
 }
