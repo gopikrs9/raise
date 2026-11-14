@@ -91,8 +91,12 @@ const ICP = {
   clock: '<circle cx="12" cy="12" r="9.5"/><path d="M12 7v5l3 2"/>',
   bookmark: '<path d="M7 3.5h10a1 1 0 0 1 1 1v16l-6-4-6 4v-16a1 1 0 0 1 1-1z"/>',
   arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>',
-  prev: '<path d="M18 5l-9 7 9 7z"/><path d="M6 5v14"/>' };
+  prev: '<path d="M18 5l-9 7 9 7z"/><path d="M6 5v14"/>',
+  back: '<path d="M15 5l-7 7 7 7"/>',
+  x: '<path d="M6 6l12 12M18 6 6 18"/>' };
 const ic = (n, sz = 18, col = "currentColor") => `<svg class="ic${n === "chev" ? " chev" : ""}" aria-hidden="true" width="${sz}" height="${sz}" viewBox="0 0 24 24" fill="none" stroke="${col}" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">${ICP[n]}</svg>`;
+/* the Raise wordmark: lowercase, the dot of the i is a lifted apricot spark */
+const wordmark = (sz = 30) => `<span class="wm" style="font-size:${sz}px" role="img" aria-label="Raise">ra<span class="wm-i"><span class="wm-stem"></span><span class="wm-dot"></span></span>se</span>`;
 /* ratings 1 to 5, tap again to clear */
 const RT_ON = "border:none;font-family:inherit;cursor:pointer;width:34px;height:34px;border-radius:17px;font-size:15px;font-weight:700;background:#4A2C5A;color:#FFFFFF;flex:0 0 auto";
 const RT_OFF = "border:none;font-family:inherit;cursor:pointer;width:34px;height:34px;border-radius:17px;font-size:15px;font-weight:700;background:#F3EEE8;color:#4A2C5A;flex:0 0 auto";
@@ -918,6 +922,15 @@ function upgrade(){
       const op = $$("button", rfS).find(b => label(b) === "Open"); if (op && op.parentElement) op.parentElement.dataset.b = "rfnextblk"; } }
   // 16. share with another parent: clearly a WhatsApp share
   $$("button", scr("Closing")).filter(b => label(b) === "Share this topic with another parent").forEach(b => { b.setAttribute("aria-label", "Share this topic with another parent"); b.innerHTML = `${WA_ICON}<span>Share with a parent on WhatsApp</span>`; b.classList.add("btn-o", "wa-share"); });
+  // 17. first screen: the Raise wordmark and a glimpse of what Raise gives you (a first line, and a reply)
+  ["Main", "GoogleFail"].forEach(id => { const sc = scr(id); if (!sc) return; const hero = $$("div", sc).find(d => /height:\s*330px/.test(d.getAttribute("style") || ""));
+    if (hero) { const art = [...hero.children].find(k => k.tagName.toLowerCase() === "svg"); const h = document.createElement("div"); h.className = "hero";
+      h.innerHTML = `<div class="hb hb-p"><small>You</small>"I noticed you've been up late. Is everything okay?"</div><div class="hb hb-t"><small>Your teen</small>"Kind of… can we talk after dinner?"</div><div class="hero-cap">Raise gives you the first line. You have the talk.</div>`;
+      if (art) art.replaceWith(h); else hero.append(h); }
+    const nm = $$("div", sc).find(d => !d.children.length && d.textContent.trim() === "Raise"); if (nm) { nm.innerHTML = wordmark(30); nm.setAttribute("aria-label", "Raise"); } });
+  // 18. back, minimise and close: one clear round button
+  $$(".screen button[aria-label=Back], .screen button[aria-label=Minimise]").forEach(b => { b.classList.add("nav-btn"); b.innerHTML = ic(b.getAttribute("aria-label") === "Back" ? "back" : "chev", 22); });
+  $$("[data-act=tpclose]").forEach(b => { b.classList.add("nav-btn"); b.innerHTML = ic("x", 20); });
   // 11. after "We talked", there is no "we have not talked yet"
   const dbq = scr("Debrief") && $$("button", scr("Debrief")).find(b => label(b) === "We have not talked yet"); if (dbq) dbq.style.display = "none";
   // 6. say what discreet mode is for
