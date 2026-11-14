@@ -929,7 +929,7 @@ function upgrade(){
     if (hero) { const art = [...hero.children].find(k => k.tagName.toLowerCase() === "svg"); const h = document.createElement("div"); h.className = "hero";
       h.innerHTML = `<div class="hb hb-p"><small>You</small>"I noticed you've been up late. Is everything okay?"</div><div class="hb hb-t"><small>Your teen</small>"Kind of… can we talk after dinner?"</div><div class="hero-cap">Raise gives you the first line. You have the talk.</div>`;
       if (art) art.replaceWith(h); else hero.append(h); }
-    const nm = $$("div", sc).find(d => !d.children.length && d.textContent.trim() === "Raise"); if (nm) { nm.innerHTML = lockup(52); nm.setAttribute("aria-label", "Raise"); } });
+    const nm = $$("div", sc).find(d => !d.children.length && d.textContent.trim() === "Raise"); if (nm) { nm.innerHTML = `<img src="logo.webp" alt="Raise" width="104" height="104" style="display:block;width:104px;height:104px;margin:-4px 0 -8px -10px" onerror="this.replaceWith(document.createTextNode('Raise'))">`; nm.setAttribute("aria-label", "Raise"); } });
   // 18. back, minimise and close: one clear round button
   $$(".screen button[aria-label=Back], .screen button[aria-label=Minimise]").forEach(b => { b.classList.add("nav-btn"); b.innerHTML = ic(b.getAttribute("aria-label") === "Back" ? "back" : "chev", 22); });
   $$("[data-act=tpclose]").forEach(b => { b.classList.add("nav-btn"); b.innerHTML = ic("x", 20); });

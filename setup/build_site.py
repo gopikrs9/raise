@@ -15,6 +15,8 @@ page = page[:m.start()] + (
     '<script type="text/plain" id="raise-app">\n' + app.replace("</script", "<\\/script") + "\n</script>\n"
     '<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>\n'
     "<script>\nwindow.RAISE_BAKED = " + baked + ";\n" + live + "\n</script>\n</body>") + page[m.end():]
+if len(sys.argv) > 1 and sys.argv[1] == "beta2":
+    page = page.replace("<title>Raise App (version 7)</title>", "<title>Raise App (version 7)</title>\n<link rel=\"icon\" href=\"icon-192.png\">\n<link rel=\"apple-touch-icon\" href=\"icon-512.png\">")
 page = page.replace("<title>Raise App (version 7)</title>", '<title>Raise · one conversation at a time</title>\n<meta name="description" content="Raise prepares Indian parents of 14 to 18 year olds for one conversation at a time with their teenager.">\n<meta name="theme-color" content="#4A2C5A">\n<link rel="manifest" href="manifest.webmanifest">')
 # on a real phone: full screen, no frame
 page = page.replace("@media (max-width:760px){ #index{display:none} body{gap:0} }",
