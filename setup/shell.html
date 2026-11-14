@@ -29,8 +29,29 @@ body{background:var(--stage);font-family:var(--font);color:var(--ink);display:fl
 #index button{display:block;width:100%;text-align:left;border:0;background:none;font:500 14px var(--font);color:var(--ink);padding:7px 8px;border-radius:10px;cursor:pointer}
 #index button[aria-current="true"]{background:#FDEBDD;color:var(--plum);font-weight:700}
 #index button:hover{background:#F6EFE7}
+/* lines a parent can say aloud look like chat bubbles */
+.say{position:relative;background:#F4ECFA!important;box-shadow:none!important;border-radius:22px 22px 22px 6px!important}
+.say::after{content:"";position:absolute;left:14px;bottom:-9px;border-width:10px 12px 0 0;border-style:solid;border-color:#F4ECFA transparent transparent transparent}
+.say-label{display:flex;align-items:center;gap:6px}
+.say.pop{animation:pop .35s ease-out}
+@keyframes pop{0%{transform:scale(.96);opacity:.4}100%{transform:scale(1);opacity:1}}
+/* first lines: swipe between three */
+.fl-row{flex-shrink:0;display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 2px 12px;scrollbar-width:none}
+.fl-row::-webkit-scrollbar{display:none}
+.fl-card{flex:0 0 82%;scroll-snap-align:start;box-sizing:border-box;border-radius:22px 22px 22px 6px;padding:12px 14px;font-size:16px;line-height:1.4;background:#FFFFFF;box-shadow:inset 0 0 0 1px #E8DFD3;cursor:pointer;color:#2A2233;outline:none}
+.fl-card.on{background:#F4ECFA;box-shadow:inset 0 0 0 2px #4A2C5A}
+.fl-card small{display:block;font-size:12px;font-weight:700;color:#6B6375;margin-bottom:4px}
+/* WhatsApp warm-up: its own green card */
+.wa-card{flex-shrink:0;margin-top:10px;background:#E8F8EE;border-radius:20px;padding:12px 12px 14px;box-shadow:inset 0 0 0 1px #BFE8CD}
+.wa-card .fl-card{background:#FFFFFF;box-shadow:inset 0 0 0 1px #CFEBD9}
+.wa-card .fl-card.on{background:#DCF8C6;box-shadow:inset 0 0 0 2px #1FA855}
+.wa-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:48px;border:none;border-radius:24px;background:#1FA855;color:#fff;font:700 16px var(--font);cursor:pointer;margin-top:4px}
+.wa-row{background:#E8F8EE!important;border-radius:16px;padding:6px 10px!important;margin-top:6px}
+/* reflection: a small celebration with the next topic */
+#celebrate{position:absolute;left:12px;right:12px;bottom:88px;z-index:40;background:#FFFFFF;border-radius:24px;box-shadow:0 14px 40px rgba(42,34,51,.28);padding:16px;animation:rise .35s ease-out}
+@keyframes rise{0%{transform:translateY(30px);opacity:0}100%{transform:none;opacity:1}}
 @media (max-width:760px){ #index{display:none} body{gap:0} }
-@media (prefers-reduced-motion:reduce){ #toast{transition:none} }
+@media (prefers-reduced-motion:reduce){ #toast{transition:none} .say.pop,#celebrate{animation:none} }
 </style>
 </head>
 <body>
