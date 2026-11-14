@@ -124,6 +124,10 @@ body.t2 .st-done{color:#2F7D57!important} body.t2 .st-plan{color:#C2453D!importa
 .lockup{display:inline-flex;align-items:center;gap:10px}
 .lockup-sym svg{width:100%;height:100%;display:block}
 .lockup-word{font-family:var(--font);font-weight:800;letter-spacing:.14em;color:#4A2C5A;line-height:1}
+/* every button presses in a little */
+.screen button{transition:transform .12s ease}
+.screen button:active{transform:scale(.97)}
+@media (prefers-reduced-motion:reduce){.screen button{transition:none}.screen button:active{transform:none}}
 /* wordmark */
 .wm{font-family:var(--font);font-weight:800;color:#4A2C5A;letter-spacing:-.03em;line-height:1;display:inline-block}
 .wm-i{position:relative;display:inline-block;width:.26em;height:.53em;margin:0 .035em;vertical-align:baseline}

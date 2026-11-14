@@ -7,6 +7,8 @@
 <meta name="description" content="Raise prepares Indian parents of 14 to 18 year olds for one conversation at a time with their teenager.">
 <meta name="theme-color" content="#4A2C5A">
 <link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-512.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
@@ -21,18 +23,141 @@ body{background:var(--stage);font-family:var(--font);color:var(--ink);display:fl
 .screen button:focus-visible,.screen a:focus-visible,.screen input:focus-visible{outline:3px solid #F4A261;outline-offset:2px}
 #toast{position:absolute;left:16px;right:16px;bottom:96px;z-index:50;background:var(--ink);color:#fff;border-radius:18px;padding:14px 16px;font-size:15px;line-height:1.4;box-shadow:0 8px 20px rgba(42,34,51,.25);opacity:0;pointer-events:none;transition:opacity .2s}
 #toast.on{opacity:1}
+.scroller{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;scrollbar-width:none}
+.scroller::-webkit-scrollbar,.hscroll::-webkit-scrollbar{display:none}
+.hscroll{overflow-x:auto!important;scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;overscroll-behavior-x:contain}
+.hscroll>*{scroll-snap-align:start}
+#phone [data-topic]{cursor:pointer}
 #index{width:260px;max-height:844px;overflow-y:auto;background:var(--card);border-radius:20px;padding:14px;box-sizing:border-box;align-self:center}
 #index h2{font-size:16px;margin:4px 6px 4px}
 #index p{font-size:13px;color:var(--quiet);margin:0 6px 10px;line-height:1.4}
 #index button{display:block;width:100%;text-align:left;border:0;background:none;font:500 14px var(--font);color:var(--ink);padding:7px 8px;border-radius:10px;cursor:pointer}
 #index button[aria-current="true"]{background:#FDEBDD;color:var(--plum);font-weight:700}
 #index button:hover{background:#F6EFE7}
+/* lines a parent can say aloud look like chat bubbles */
+.say{position:relative;background:#F4ECFA!important;box-shadow:none!important;border-radius:22px 22px 22px 6px!important}
+.say::after{content:"";position:absolute;left:14px;bottom:-9px;border-width:10px 12px 0 0;border-style:solid;border-color:#F4ECFA transparent transparent transparent}
+.say-label{display:flex;align-items:center;gap:6px}
+.say.pop{animation:pop .35s ease-out}
+@keyframes pop{0%{transform:scale(.96);opacity:.4}100%{transform:scale(1);opacity:1}}
+/* first lines: swipe between three */
+.fl-row{flex-shrink:0;display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 2px 12px;scrollbar-width:none}
+.fl-row::-webkit-scrollbar{display:none}
+.fl-card{backdrop-filter:blur(10px);flex:0 0 82%;scroll-snap-align:start;box-sizing:border-box;border-radius:22px 22px 22px 6px;padding:12px 14px;font-size:16px;line-height:1.4;background:#FFFFFF;box-shadow:inset 0 0 0 1px #E8DFD3;cursor:pointer;color:#2A2233;outline:none}
+.fl-card.on{background:#F4ECFA;box-shadow:inset 0 0 0 2px #4A2C5A}
+.fl-card small{display:block;font-size:12px;font-weight:700;color:#6B6375;margin-bottom:4px}
+/* WhatsApp warm-up: its own green card */
+.wa-card{flex-shrink:0;margin-top:10px;background:linear-gradient(160deg,rgba(236,250,242,.75),rgba(255,255,255,.6));-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.85);border-radius:20px;padding:12px 12px 14px;box-shadow:0 8px 24px rgba(31,122,77,.08)}
+.wa-card .fl-card{background:#FFFFFF;box-shadow:inset 0 0 0 1px #CFEBD9}
+.wa-card .fl-card.on{background:#E3F6EA;box-shadow:inset 0 0 0 2px #2FA36B}
+.wa-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:48px;border:none;border-radius:24px;background:linear-gradient(135deg,#34C27A,#1E9A5A);color:#fff;font:700 16px var(--font);cursor:pointer;margin-top:4px;box-shadow:0 6px 16px rgba(30,154,90,.25)}
+.wa-row{background:rgba(236,250,242,.7)!important;border:1px solid rgba(255,255,255,.85)!important;border-radius:16px;padding:6px 10px!important;margin-top:6px}
+/* ---- design pass 15 Nov: glass surfaces, one button language, clear status colours ---- */
+.glass{background:rgba(255,255,255,.62)!important;-webkit-backdrop-filter:blur(16px) saturate(140%);backdrop-filter:blur(16px) saturate(140%);border:1px solid rgba(255,255,255,.8);box-shadow:0 8px 24px rgba(74,44,90,.08)!important}
+.ic{flex:none;display:inline-block;vertical-align:-3px}
+/* lesson toolbar: three equal tiles, icon above a one-word label */
+.tb{display:grid!important;grid-template-columns:repeat(4,1fr);gap:8px;padding:8px;border-radius:22px;margin-top:14px!important}
+.tb button{height:60px!important;width:100%;flex-direction:column!important;justify-content:center!important;align-items:center!important;gap:3px!important;border-radius:16px!important;font-size:13px!important;font-weight:700!important;padding:0 4px!important;background:rgba(255,255,255,.75)!important;color:#4A2C5A!important;margin:0!important;white-space:nowrap}
+.tb .tb-ask{background:#EFE6FA!important;color:#5B3A8C!important}
+.tb .tb-next{background:#FDE7D6!important;color:#9A4A16!important}
+.ready-gap{margin-top:16px!important}
+.ch-chip{display:inline-flex!important;align-self:flex-start;width:auto!important;background:#EFE6FA;color:#5B3A8C!important;border-radius:12px;padding:3px 10px;font-size:12.5px!important;font-weight:700!important}
+.ch-end{display:flex;align-items:center;gap:10px;margin:18px 0 6px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#9A8FA6}
+.ch-end::before,.ch-end::after{content:"";flex:1;height:1px;background:#E6DCEB}
+/* buttons: filled = main action, outline = secondary, red outline = remove */
+.btn-f,.btn-o{display:inline-flex!important;align-items:center;justify-content:center;gap:6px;height:42px!important;padding:0 16px!important;border-radius:21px!important;font:700 15px var(--font)!important;cursor:pointer;white-space:nowrap}
+.btn-f{background:#4A2C5A!important;color:#FFFFFF!important;border:none!important;box-shadow:0 4px 12px rgba(74,44,90,.22)}
+.btn-o{background:rgba(255,255,255,.7)!important;color:#4A2C5A!important;border:1.5px solid #4A2C5A!important}
+.btn-danger{color:#B83A3A!important;border-color:#E3A3A3!important}
+.btn-center{align-self:center;margin:14px auto 0!important}
+/* section headings */
+.sec-h{font-size:17px!important;font-weight:700!important;color:#2A2233!important;margin:22px 0 6px!important;display:flex;align-items:center;gap:8px}
+.lab-ic{display:flex!important;align-items:center;gap:6px}
+/* chevrons turn when a section opens */
+.chev{transition:transform .2s ease}
+details[open] .chev,[aria-expanded=true] .chev{transform:rotate(180deg)}
+details summary{list-style:none}
+details summary::-webkit-details-marker{display:none}
+/* My topics status colours */
+.st{display:flex!important;align-items:center;gap:5px;font-weight:600}
+.st-done{color:#1F7A4D!important}
+.st-plan{color:#C23B3B!important}
+.st-go{color:#B45309!important}
+.st-next{color:#5B3A8C!important}
+.st-saved{color:#6B6375!important}
+/* reflection: while the celebration is open, the page does not repeat "Next for you" */
+.celebrating [data-b=rfnextblk]{display:none!important}
+/* the line bubble on the player keeps one height, so the controls never move */
+#s-Player .say{height:184px;box-sizing:border-box;overflow-y:auto;overscroll-behavior:contain}
+.wa-toggle{background:linear-gradient(160deg,rgba(236,250,242,.8),rgba(255,255,255,.6))!important}
+.wa-share{width:100%;height:48px!important}
+
+/* ================= BETA 2 THEME: warm minimal + a touch of glass (body.t2) =================
+   one family of colours: plum = act, peach = say/highlight, glass white = surfaces,
+   status colours only as small text, WhatsApp green only on its icon */
+body.t2 #phone{background:linear-gradient(180deg,#FFF8F0 0%,#FBEDE4 58%,#F5E8EC 100%)}
+body.t2 .screen>div{background-color:transparent!important}
+body.t2 #s-Read>div{background:#FFF8F0!important}
+body.t2 .screen [style*="background: #FFFFFF"]:not(button){background:rgba(255,255,255,.78)!important;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 6px 20px rgba(74,44,90,.07),inset 0 0 0 1px rgba(255,255,255,.85)!important}
+body.t2 .glass{background:rgba(255,255,255,.72)!important}
+/* say = peach */
+body.t2 .screen .say.say,body.t2 .say{background:rgba(253,235,221,.94)!important;box-shadow:none!important}
+body.t2 .say::after{border-color:rgba(253,235,221,.92) transparent transparent transparent}
+body.t2 .fl-card{background:rgba(255,255,255,.8);box-shadow:inset 0 0 0 1px rgba(232,223,211,.9)}
+body.t2 .fl-card.on{background:#FDEBDD;box-shadow:inset 0 0 0 2px #4A2C5A}
+body.t2 .ch-chip{background:#FDEBDD;color:#7A3E1A!important}
+/* toolbar: four equal glass tiles; only Next is peach */
+body.t2 .tb button{background:rgba(255,255,255,.82)!important;color:#4A2C5A!important}
+body.t2 .tb .tb-ask{background:rgba(255,255,255,.82)!important;color:#4A2C5A!important}
+body.t2 .tb .tb-next{background:#FDEBDD!important;color:#4A2C5A!important}
+/* WhatsApp: glass surfaces, plum outline buttons, green only on the icon */
+body.t2 .wa-toggle{background:rgba(255,255,255,.75)!important}
+body.t2 .wa-toggle span span:last-child{color:#6B6375!important}
+body.t2 .wa-card{background:rgba(255,255,255,.7)!important;box-shadow:0 6px 20px rgba(74,44,90,.07)!important}
+body.t2 .wa-card .fl-card{background:rgba(255,255,255,.88);box-shadow:inset 0 0 0 1px rgba(232,223,211,.9)}
+body.t2 .wa-card .fl-card.on{background:#FDEBDD;box-shadow:inset 0 0 0 2px #4A2C5A}
+body.t2 .wa-btn{background:rgba(255,255,255,.75)!important;color:#4A2C5A!important;border:1.5px solid #4A2C5A!important;box-shadow:none!important}
+body.t2 .wa-btn svg path{fill:#25D366}
+body.t2 .wa-card [data-b=sparkhint]{color:#6B6375!important}
+body.t2 .wa-card>div:first-child{color:#4A2C5A!important}
+/* buttons */
+body.t2 .btn-o{background:rgba(255,255,255,.72)!important;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+/* status: muted, warm-compatible */
+body.t2 .st-done{color:#2F7D57!important} body.t2 .st-plan{color:#C2453D!important} body.t2 .st-go{color:#B7791F!important}
+@media (prefers-reduced-transparency:reduce){ body.t2 .glass, body.t2 .screen [style*="background: #FFFFFF"]{-webkit-backdrop-filter:none;backdrop-filter:none;background:#FFFFFF!important} }
+/* logo: heart symbol + RAISE */
+.lockup{display:inline-flex;align-items:center;gap:10px}
+.lockup-sym svg{width:100%;height:100%;display:block}
+.lockup-word{font-family:var(--font);font-weight:800;letter-spacing:.14em;color:#4A2C5A;line-height:1}
+/* every button presses in a little */
+.screen button{transition:transform .12s ease}
+.screen button:active{transform:scale(.97)}
+@media (prefers-reduced-motion:reduce){.screen button{transition:none}.screen button:active{transform:none}}
+/* wordmark */
+.wm{font-family:var(--font);font-weight:800;color:#4A2C5A;letter-spacing:-.03em;line-height:1;display:inline-block}
+.wm-i{position:relative;display:inline-block;width:.26em;height:.53em;margin:0 .035em;vertical-align:baseline}
+.wm-stem{position:absolute;left:.03em;right:.03em;bottom:0;height:.53em;border-radius:.1em;background:#4A2C5A}
+.wm-dot{position:absolute;left:50%;top:-.36em;width:.25em;height:.25em;margin-left:-.125em;border-radius:50%;background:#F4A261}
+/* first screen: a glimpse of a real conversation */
+.hero{width:100%;padding:96px 22px 18px;box-sizing:border-box;display:flex;flex-direction:column;gap:10px}
+.hb{max-width:80%;padding:10px 14px;font-size:15.5px;line-height:1.4;box-shadow:0 6px 18px rgba(74,44,90,.10)}
+.hb small{display:block;font-size:11.5px;font-weight:700;opacity:.75;margin-bottom:2px}
+.hb-p{align-self:flex-end;background:#4A2C5A;color:#FFFFFF;border-radius:20px 20px 6px 20px}
+.hb-t{align-self:flex-start;background:rgba(255,255,255,.88);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);color:#2A2233;border-radius:20px 20px 20px 6px}
+.hero-cap{align-self:center;margin-top:6px;font-size:13px;font-weight:700;color:#7A3E1A;background:rgba(255,255,255,.6);padding:5px 12px;border-radius:14px}
+/* back / minimise / close: one round, clearly tappable button */
+.nav-btn{width:42px!important;height:42px!important;border-radius:21px!important;margin-left:0!important;background:rgba(255,255,255,.85)!important;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);color:#4A2C5A!important;box-shadow:0 3px 12px rgba(74,44,90,.14),inset 0 0 0 1px rgba(74,44,90,.10)!important;display:flex!important;align-items:center;justify-content:center;flex:none}
+.nav-btn .ic{stroke-width:2.2}
+.nav-btn:active{transform:scale(.94)}
+/* reflection: a small celebration with the next topic */
+#celebrate{position:absolute;left:12px;right:12px;bottom:88px;z-index:40;background:rgba(255,255,255,.88);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.9);border-radius:24px;box-shadow:0 14px 40px rgba(42,34,51,.28);padding:16px;animation:rise .35s ease-out}
+@keyframes rise{0%{transform:translateY(30px);opacity:0}100%{transform:none;opacity:1}}
 @media (max-width:760px){ #index{display:none} body{gap:0;background:#FFF8F0} #phone{border-radius:0;box-shadow:none} }
-@media (prefers-reduced-motion:reduce){ #toast{transition:none} }
+@media (prefers-reduced-motion:reduce){ #toast{transition:none} .say.pop,#celebrate{animation:none} }
 body:not(.review) #index{display:none} body:not(.review){gap:0}
 </style>
 </head>
-<body>
+<body class="t2">
 <script>if (/[?&]review\b/.test(location.search)) document.body.classList.add('review');</script>
 <aside id="index" aria-label="All screens">
   <h2>Raise · version 7</h2>
@@ -908,8 +1033,89 @@ try { S = Object.assign(fresh(), JSON.parse(localStorage.getItem("raise-v7b") ||
 const save = () => { try { localStorage.setItem("raise-v7b", JSON.stringify(S)); } catch (e) {} if (H.save) H.save(S); };
 const P = (slug = S.cur) => (S.t[slug] = S.t[slug] || { stage: "new", ch: 0, sent: 0, line: 0, date: null, place: "after dinner", saved: [], debrief: {}, tries: 0 });
 const T = () => bySlug(S.cur) || TOPICS[0];
-const L = () => T().lesson;
+/* lesson in the parent's language (Telugu / Hindi beta): text, first lines, talk card, second try. Screens stay in English. */
+const LANG_NAME = { en: "English", te: "Telugu", hi: "Hindi" }, LANG_CODE = { en: "en-IN", te: "te-IN", hi: "hi-IN" };
+const _lx = {};
+const hasLang = (t, lg) => !!(t && t.lesson && t.lesson.tr && t.lesson.tr[lg] && Array.isArray(t.lesson.tr[lg].chapters) && t.lesson.tr[lg].chapters.length === t.lesson.chapters.length);
+function LX(t){
+  const b = t && t.lesson; if (!b) return b; const lg = S.lang || "en"; if (lg === "en" || !hasLang(t, lg)) return b;
+  const key = t.slug + "|" + lg; if (_lx[key]) return _lx[key]; const tr = b.tr[lg];
+  return _lx[key] = Object.assign({}, b, {
+    chapters: b.chapters.map((c, i) => ({ n: c.n, secs: c.secs, title: tr.chapters[i].title || c.title, text: noCite(tr.chapters[i].text || c.text) })),
+    first_lines: Array.isArray(tr.first_lines) && tr.first_lines.length === 3 ? tr.first_lines : b.first_lines,
+    talk_card: Object.assign({}, b.talk_card || {}, tr.talk_card || {}), say: (tr.talk_card && (tr.talk_card.ask || tr.talk_card.open)) || b.say,
+    second_try: tr.second_try ? Object.assign({}, b.second_try || {}, tr.second_try) : b.second_try, sparks: Array.isArray(tr.sparks) && tr.sparks.length ? tr.sparks : b.sparks,
+    audio: [], lang: lg, title: tr.title || t.title });
+}
+const L = () => LX(T());
 let playing = false;
+/* a different line to say for each chapter: the lesson's first lines, talk-card lines, second-try lines and curiosity questions, in turn */
+function linesPool(){ const l = L(); if (!l) return []; const tc = l.talk_card || {}, st = l.second_try || {};
+  const pool = [...(l.first_lines || []), tc.ask, tc.open, st.repair_line, st.new_way_in, ...(l.sparks || [])].map(x => noCite(x || "").replace(/^["'“]+|["'”]+$/g, "").trim()).filter(x => x.length > 8);
+  return [...new Set(pool)]; }
+const sparkList = () => { const l = L(); return l ? [...new Set((l.sparks || []).map(x => noCite(x || "").trim()).filter(x => x.length > 8))] : []; };
+const chLine = i => { const pool = linesPool(); return pool.length ? pool[i % pool.length] : (L() ? L().say : ""); };
+/* lesson language switch, shown wherever a lesson is read, heard or planned */
+const LANGS = [["en", "English"], ["te", "తెలుగు"], ["hi", "हिन्दी"]];
+const LB_ON = "border:none;font-family:inherit;cursor:pointer;height:34px;padding:0 14px;border-radius:17px;font-size:14px;font-weight:700;background:#4A2C5A;color:#FFFFFF;flex:0 0 auto";
+const LB_OFF = "border:none;font-family:inherit;cursor:pointer;height:34px;padding:0 14px;border-radius:17px;font-size:14px;font-weight:700;background:#FFFFFF;color:#4A2C5A;box-shadow:inset 0 0 0 1px #E8DFD3;flex:0 0 auto";
+function langBar(){ const d = document.createElement("div"); d.dataset.b = "langbar";
+  d.setAttribute("style", "display:flex;align-items:center;gap:6px;margin:10px 0 6px;flex-wrap:wrap");
+  d.innerHTML = `<span style="font-size:13px;font-weight:700;color:#6B6375;margin-right:4px">Lesson language</span>` + LANGS.map(([k, n]) => `<button data-lang="${k}" aria-label="${n === "English" ? "English" : n + " (" + LANG_NAME[k] + ")"}" style="${LB_OFF}">${n}</button>`).join("");
+  return d; }
+const GLOBE = '<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg>';
+const SHORT_LANG = { en: "EN", te: "తె", hi: "हि" };
+function langBtn(kind){ const b = document.createElement("button"); b.dataset.act = "langmenu"; b.dataset.langlabel = kind; b.setAttribute("aria-label", "Lesson language");
+  b.setAttribute("style", kind === "col" ? "border:none;font-family:inherit;cursor:pointer;background:none;color:#6B6375;display:flex;flex-direction:column;align-items:center;font-size:14px;font-weight:600;width:52px;height:48px;justify-content:center;gap:1px"
+    : "border:none;font-family:inherit;cursor:pointer;background:#FFFFFF;color:#4A2C5A;display:flex;align-items:center;gap:4px;height:36px;padding:0 10px;border-radius:18px;font-size:14px;font-weight:700;box-shadow:inset 0 0 0 1px #E8DFD3");
+  return b; }
+function drawLangBtns(sc){ const lg = S.lang || "en";
+  $$("[data-act=langmenu]", sc).forEach(b => { const k = b.dataset.langlabel;
+    if (k === "full") b.textContent = { en: "English", te: "తెలుగు", hi: "हिन्दी" }[lg];
+    else if (k === "col") b.innerHTML = `${GLOBE}<span>${SHORT_LANG[lg]}</span>`;
+    else b.innerHTML = `${GLOBE.replace(/22/g, "18")}<span>${SHORT_LANG[lg]}</span>`; }); }
+function openLangMenu(from){
+  closeLangMenu(); const ph = $("#phone"), r = from.getBoundingClientRect(), pr = ph.getBoundingClientRect(), k = pr.width / 390;
+  const m = document.createElement("div"); m.id = "langmenu"; m.setAttribute("role", "menu");
+  m.setAttribute("style", `position:absolute;z-index:60;right:${Math.max(12, (pr.right - r.right) / k)}px;top:${(r.bottom - pr.top) / k + 6}px;width:230px;background:#FFFFFF;border-radius:18px;box-shadow:0 12px 32px rgba(42,34,51,.22);padding:8px`);
+  const t = T(), lg = S.lang || "en";
+  m.innerHTML = `<div style="font-size:12.5px;font-weight:700;color:#6B6375;padding:6px 10px 4px">Lesson language</div>` + LANGS.map(([c, n]) => {
+    const missing = c !== "en" && t && ready(t) && !hasLang(t, c);
+    return `<button role="menuitemradio" aria-checked="${c === lg}" data-lang="${c}" style="display:flex;align-items:center;justify-content:space-between;width:100%;border:none;background:${c === lg ? "#FDEBDD" : "none"};font-family:inherit;cursor:pointer;height:46px;padding:0 10px;border-radius:12px;font-size:16px;font-weight:${c === lg ? 700 : 600};color:#2A2233;text-align:left"><span>${n}${c === "en" ? "" : ` <span style="font-size:12.5px;color:#6B6375;font-weight:600">${LANG_NAME[c]} · beta${missing ? " · not for this lesson yet" : ""}</span>`}</span>${c === lg ? "<span style=\"color:#4A2C5A\">✓</span>" : ""}</button>`; }).join("")
+    + `<div style="font-size:12px;color:#6B6375;padding:6px 10px 4px;line-height:1.35">Lesson text, voice and doubts change. Buttons stay in English for now. More languages later.</div>`;
+  ph.append(m); setTimeout(() => m.querySelector("[aria-checked=true]").focus(), 0); }
+const closeLangMenu = () => { const m = $("#langmenu"); if (m) m.remove(); };
+
+const WA_ICON = '<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24"><path fill="#1FA855" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.6a2.8 2.8 0 0 0 1.8-1.3 2.3 2.3 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3z"/></svg>';
+const ICP = {
+  list: '<path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r=".9" fill="currentColor"/><circle cx="3.5" cy="12" r=".9" fill="currentColor"/><circle cx="3.5" cy="18" r=".9" fill="currentColor"/>',
+  ask: '<circle cx="12" cy="12" r="9.5"/><path d="M9.2 9.2a2.9 2.9 0 0 1 5.6 1c0 1.9-2.8 2.6-2.8 2.6"/><circle cx="12" cy="16.9" r=".9" fill="currentColor"/>',
+  next: '<path d="M6 5l9 7-9 7z"/><path d="M18 5v14"/>',
+  say: '<path d="M20.5 14.5a2 2 0 0 1-2 2H8l-4.5 3.5V5.5a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2z"/><path d="M8 9h8M8 12.5h5"/>',
+  cal: '<rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M16 2.5v4M8 2.5v4M3.5 10h17"/>',
+  bulb: '<path d="M9 18h6M10 21.5h4"/><path d="M12 2.5a6.5 6.5 0 0 0-3.8 11.8c.6.5.8 1.2.8 1.9V16h6v-.2c0-.7.3-1.4.8-1.9A6.5 6.5 0 0 0 12 2.5z"/>',
+  bell: '<path d="M6 9a6 6 0 0 1 12 0c0 6.5 2.5 8 2.5 8h-17S6 15.5 6 9z"/><path d="M10.3 20.5a1.9 1.9 0 0 0 3.4 0"/>',
+  pen: '<path d="M16.5 3.5a2.4 2.4 0 0 1 3.4 3.4L8 18.8 3.5 20.5l1.7-4.5z"/>',
+  chev: '<path d="m6 9 6 6 6-6"/>',
+  redo: '<path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1L3.5 8.5"/><path d="M3.5 3.5v5h5"/>',
+  play: '<path d="M7 4.5l12 7.5-12 7.5z"/>',
+  check: '<circle cx="12" cy="12" r="9.5"/><path d="m8 12.3 2.7 2.7L16.2 9.5"/>',
+  trash: '<path d="M3.5 6.5h17M9 6.5V4h6v2.5M18.5 6.5l-1 13.5h-11l-1-13.5"/>',
+  plan: '<rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M16 2.5v4M8 2.5v4M3.5 10h17"/><path d="m9 15 2 2 4-4"/>',
+  clock: '<circle cx="12" cy="12" r="9.5"/><path d="M12 7v5l3 2"/>',
+  bookmark: '<path d="M7 3.5h10a1 1 0 0 1 1 1v16l-6-4-6 4v-16a1 1 0 0 1 1-1z"/>',
+  arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>',
+  prev: '<path d="M18 5l-9 7 9 7z"/><path d="M6 5v14"/>',
+  back: '<path d="M15 5l-7 7 7 7"/>',
+  x: '<path d="M6 6l12 12M18 6 6 18"/>' };
+const ic = (n, sz = 18, col = "currentColor") => `<svg class="ic${n === "chev" ? " chev" : ""}" aria-hidden="true" width="${sz}" height="${sz}" viewBox="0 0 24 24" fill="none" stroke="${col}" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">${ICP[n]}</svg>`;
+/* the Raise wordmark: lowercase, the dot of the i is a lifted apricot spark */
+const LOGO_SYM = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="92 104 328 300" role="img" aria-label="Raise"> <defs> <clipPath id="sheart"><path d="M256 392 C150 312 92 246 116 176 C136 118 218 108 256 166 C294 108 376 118 396 176 C420 246 362 312 256 392 Z"/></clipPath> <path id="shead" d="M170 180 C176 160 206 152 226 165 C239 174 243 190 241 203 L251 217 L242 222 C245 228 241 232 239 236 C241 243 237 250 227 254 C219 258 213 262 209 270 L211 292 L182 292 L184 262 C168 252 158 236 158 214 C158 198 163 188 170 180 Z"/> </defs><g clip-path="url(#sheart)"> <g fill="#4A2C5A"> <circle cx="163" cy="186" r="19"/> <use xlink:href="#shead" href="#shead"/> <path d="M116 400 C118 322 154 290 196 288 C238 290 270 318 278 400 Z"/> </g> <g fill="#4A2C5A" stroke="#FFF3EA" stroke-width="7" paint-order="stroke"> <use xlink:href="#shead" href="#shead" transform="translate(461 70) scale(-0.78 0.78)"/> <path d="M256 400 C260 330 280 298 307 296 C334 298 358 328 366 400 Z"/> </g> </g> <path d="M256 392 C150 312 92 246 116 176 C136 118 218 108 256 166 C294 108 376 118 396 176 C420 246 362 312 256 392 Z" fill="none" stroke="#F4A261" stroke-width="20" stroke-linejoin="round"/> </svg>`;
+const lockup = (h = 52) => `<span class="lockup" role="img" aria-label="Raise"><span class="lockup-sym" style="height:${h}px;width:${Math.round(h * 328 / 300)}px">${LOGO_SYM}</span><span class="lockup-word" style="font-size:${Math.round(h * .5)}px">RAISE</span></span>`;
+const wordmark = (sz = 30) => `<span class="wm" style="font-size:${sz}px" role="img" aria-label="Raise">ra<span class="wm-i"><span class="wm-stem"></span><span class="wm-dot"></span></span>se</span>`;
+/* ratings 1 to 5, tap again to clear */
+const RT_ON = "border:none;font-family:inherit;cursor:pointer;width:34px;height:34px;border-radius:17px;font-size:15px;font-weight:700;background:#4A2C5A;color:#FFFFFF;flex:0 0 auto";
+const RT_OFF = "border:none;font-family:inherit;cursor:pointer;width:34px;height:34px;border-radius:17px;font-size:15px;font-weight:700;background:#F3EEE8;color:#4A2C5A;flex:0 0 auto";
 
 /* ---------------- dates ---------------- */
 const DAY = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -918,6 +1124,9 @@ const addDays = n => { const d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(
 const today = iso(addDays(0));
 function dayLabel(isoDate){ if (!isoDate) return "Not planned"; if (isoDate === today) return "Tonight"; if (isoDate === iso(addDays(1))) return "Tomorrow"; const d = new Date(isoDate + "T12:00"); return `${DAY[d.getDay()]} ${d.getDate()} ${MON[d.getMonth()]}`; }
 const greet = () => { const h = new Date().getHours(); return h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening"; };
+/* first name from the Google account; nothing for invisible sign-in */
+const firstName = () => { const U = H.user ? H.user() : null; return U && U.name && U.name !== "Parent" ? U.name : ""; };
+const greetName = () => firstName() ? `${greet()}, ${firstName()}` : greet();
 
 /* ---------------- phone frame ---------------- */
 function fit(){ const side = innerWidth > 760 && getComputedStyle($("#index")).display !== "none" ? 300 : 0, phone = innerWidth <= 500; const k = Math.min(phone ? 2 : 1, (innerHeight - (phone ? 0 : 24)) / 844, (innerWidth - side - (phone ? 0 : 16)) / 390); const p = $("#phone"); p.style.transform = `scale(${k})`; p.style.margin = `${(844 * k - 844) / 2}px ${(390 * k - 390) / 2}px`; }
@@ -985,7 +1194,7 @@ function capture(){
   // me header and rows
   $$(".screen").forEach(sc => {
     const nm = byText(sc, "Lakshmi"); if (nm) { nm.dataset.b = "meName"; const av = byText(sc, "L"); if (av) av.dataset.b = "meAvatar"; const si = byText(sc, "Signed in with Google"); if (si) si.dataset.b = "meSign"; }
-    [["Child's age", "age"], ["My family note", "notes"], ["Text size", "textSize"], ["Discreet mode", "discreet"], ["Add a thought from", "lens"]].forEach(([p, k]) => {
+    [["Language", "lang"], ["Child's age", "age"], ["My family note", "notes"], ["Text size", "textSize"], ["Discreet mode", "discreet"], ["Add a thought from", "lens"]].forEach(([p, k]) => {
       $$("a", sc).filter(a => label(a).startsWith(p)).forEach(a => { const leaves = $$("span,div", a).filter(e => !e.children.length && e.textContent.trim() && !e.textContent.trim().startsWith(p)); if (leaves.length) leaves[leaves.length - 1].dataset.v = k; });
     });
   });
@@ -1017,6 +1226,38 @@ function capture(){
   $$(".screen div").forEach(d => { const s = d.getAttribute("style") || ""; if (s.includes("inset: 0") && s.includes("rgba(42,34,51")) d.dataset.overlay = "1"; });
 }
 
+
+/* ---------------- scrolling ----------------
+   v7 screens are drawn at exactly one phone height. Everything that flows on the page moves into a scroller;
+   bars pinned to the screen (bottom menu, sheets, buttons fixed at the bottom) stay put above it.
+   Rows wider than the screen (chips, cards, filters, days) swipe sideways. */
+function makeScrollable(){
+  $$(".screen").forEach(sc => {
+    const root = sc.firstElementChild; if (!root || root.dataset.scroll) return; root.dataset.scroll = "1";
+    const pinned = k => /position:\s*(absolute|fixed)/.test(k.getAttribute("style") || "");
+    const flow = [...root.children].filter(k => !pinned(k)); if (!flow.length) return;
+    [...root.children].filter(pinned).forEach(k => { if (!/z-index/.test(k.getAttribute("style") || "")) k.style.zIndex = "1"; });
+    const box = document.createElement("div"); box.className = "scroller";
+    root.insertBefore(box, flow[0]); flow.forEach(k => box.appendChild(k));
+    $$("*", box).concat(flow).forEach(e => { const s = e.getAttribute && e.getAttribute("style") || ""; if (/(^|;)\s*height:\s*100%/.test(s)) { e.style.height = ""; e.style.minHeight = "100%"; } });
+  });
+}
+function fitScroll(sc, top){
+  const root = sc.firstElementChild, box = root && $(".scroller", root); if (!box) return;
+  // room under the content for whatever is pinned to the bottom of the screen
+  let pad = 0; const H0 = root.clientHeight; [...root.children].forEach(k => { if (k === box || k.offsetParent === null) return; const s = k.getAttribute("style") || "";
+    if (/position:\s*absolute/.test(s) && /bottom:/.test(s) && !/top:\s*0/.test(s) && !/inset:\s*0/.test(s) && k.offsetHeight < 300) pad = Math.max(pad, H0 - k.offsetTop); });
+  box.style.paddingBottom = (pad ? pad + 16 : 24) + "px";
+  if (top) box.scrollTop = 0;
+  // sheets that grow up from the bottom scroll inside themselves
+  [...root.children].forEach(k => { const s = k.getAttribute("style") || ""; if (k !== box && /position:\s*absolute/.test(s) && /bottom:\s*0/.test(s) && k.offsetHeight >= 300) { k.style.maxHeight = "92%"; k.style.overflowY = "auto"; } });
+  // sideways rows
+  $$("div, nav, ul", sc).forEach(r => { if (r.classList.contains("hscroll")) return; const cs = getComputedStyle(r);
+    if (cs.display !== "flex" || cs.flexDirection !== "row" || cs.flexWrap !== "nowrap" || r.children.length < 2) return;
+    if (r.closest("[data-b=bottomnav]") || r.tagName === "NAV" && r.closest("nav") === r && r.querySelector("a[href]") && r.children.length <= 4 && r.scrollWidth <= r.clientWidth + 2) return;
+    if (r.scrollWidth > r.clientWidth + 4) { r.classList.add("hscroll"); [...r.children].forEach(c => c.style.flexShrink = "0"); } });
+}
+
 /* ---------------- drawing ---------------- */
 /* cover image when one passed the image judge; pastel tile with icon otherwise (and always in discreet mode) */
 function paint(sq, t, icon){
@@ -1037,7 +1278,7 @@ function card(t, big){
 }
 const cats = () => { const all = [...new Set(TOPICS.map(t => t.category))]; return all.sort((a, b) => (S.concerns.some(c => a.startsWith(c.split(" ")[0])) ? 0 : 1) - (S.concerns.some(c => b.startsWith(c.split(" ")[0])) ? 0 : 1)); };
 function drawHome(sc){
-  const g = $("[data-b=greet]", sc); if (g) g.textContent = sc.id === "s-Gate" ? greet() : greet();
+  const g = $("[data-b=greet]", sc); if (g) g.textContent = greetName();
   const chips = $("[data-b=chips]", sc);
   if (chips) chips.innerHTML = ["All", ...cats()].map(c => `<button data-cat="${esc(c)}" style="${c === S.filter ? TPL.chipOn : TPL.chipOff}">${esc(c)}</button>`).join("");
   const slot = $("[data-b=rows]", sc);
@@ -1052,12 +1293,12 @@ function drawHome(sc){
   const planned = Object.entries(S.t).find(([s, p]) => p.stage === "planned");
   const nc = $("[data-b=nextcard]", sc);
   if (nc) { nc.style.display = planned ? "" : "none";
-    if (planned) { const [s, p] = planned, t = bySlug(s); $("[data-b=nextwhen]", sc).textContent = `Your next step · ${dayLabel(p.date).toLowerCase()}, ${p.place}`; $("[data-b=nextline]", sc).textContent = `"${t.lesson.first_lines[p.line] || p.custom}"`; nc.dataset.topic = s; } }
+    if (planned) { const [s, p] = planned, t = bySlug(s); $("[data-b=nextwhen]", sc).textContent = `Your next step · ${dayLabel(p.date).toLowerCase()}, ${p.place}`; $("[data-b=nextline]", sc).textContent = ready(t) ? `"${p.custom || LX(t).first_lines[p.line]}"` : ""; nc.dataset.topic = s; } }
   const mc = $("[data-b=minicard]", sc), started = Object.entries(S.t).find(([s, p]) => p.stage === "listening");
   if (mc) { mc.style.display = started ? "" : "none"; if (started) { const t = bySlug(started[0]); $("[data-b=minititle]", sc).textContent = S.discreet ? t.category : (t.short || t.title); $("[data-b=mini]", sc).textContent = `Chapter ${started[1].ch + 1} of ${t.lesson.chapters.length} · ${playing ? "playing" : "paused"}`; mc.dataset.topic = started[0]; } }
 }
 function drawPreview(sc){
-  const t = T(), title = $("[data-b=pvtitle]", sc); if (!title) return; title.textContent = t.title;
+  const t = T(), title = $("[data-b=pvtitle]", sc); if (!title) return; title.textContent = (ready(t) && LX(t).title) || t.title;
   if (TPL.pvIcon) { if (!TPL.pvIconHtml) TPL.pvIconHtml = TPL.pvIcon.innerHTML; paint(TPL.pvIcon, t, TPL.pvIconHtml); }
   const list = $("[data-b=pvlist]", sc), li = list.children[0];
   const items = ready(t) ? [t.lesson.chapters[2].title, "Three ways to begin, word for word", "How they may react, and what you can say"]
@@ -1066,6 +1307,10 @@ function drawPreview(sc){
   $("[data-b=pvdesc]", sc).textContent = ready(t) ? noCite(t.summary).split(". ")[0] + "." : noCite(t.family_need);
   $("[data-b=pvlisthead]", sc).textContent = ready(t) ? "You will learn" : "Why this topic";
   $("[data-b=pvmeta]", sc).textContent = ready(t) ? `${t.duration_min} min · ${t.lesson.chapters.length} chapters · ${t.lesson.sources.length} research papers` : "Found by the Raise topic finder from research and reports";
+  // bookmark: filled once the topic is in My topics
+  const sv = $("[data-act=savelater]", sc); if (sv) { const st = (S.t[t.slug] || {}).stage, on = !!st && !["new", "removed"].includes(st);
+    const path = sv.querySelector("svg path"); if (path) path.setAttribute("fill", on ? "currentColor" : "none");
+    sv.lastChild.textContent = on ? (st === "saved" ? "Saved" : "In My topics") : "Save for later"; sv.style.color = on ? "#4A2C5A" : "#6B6375"; sv.setAttribute("aria-pressed", String(on)); }
 }
 function drawSeeAll(sc){
   const c = S.seeCat || "All", list = c === "All" ? TOPICS.filter(ready).concat(TOPICS.filter(t => !ready(t))) : TOPICS.filter(t => t.category === c);
@@ -1098,8 +1343,16 @@ function drawMyTopics(sc){
   mine.filter(x => x !== top).forEach(([s, p]) => { const t = bySlug(s);
     const [tpl, sub] = p.stage === "planned" ? [TPL.myTalk, `Next: talk ${dayLabel(p.date).toLowerCase()}`] : p.stage === "listening" ? [TPL.myCont, `Next: finish listening · chapter ${p.ch + 1} of ${t.lesson.chapters.length}`]
       : p.stage === "heard" ? [TPL.myTalk, "Next: plan your talk"] : p.stage === "done" ? [TPL.myDone, `Done · talked ${dayLabel(p.talked || today)}`] : [TPL.mySaved, ready(t) ? "Saved · not started" : "Saved · lesson coming soon"];
-    const n = clone(tpl); n.dataset.topic = s; fillRow(n, t, sub); const b = n.querySelector("button"); if (b && tpl === TPL.myTalk) b.textContent = p.stage === "heard" ? "Plan talk" : "Talk card"; list.append(n); });
+    const n = clone(tpl); n.dataset.topic = s; fillRow(n, t, sub); const b = n.querySelector("button"); if (b && tpl === TPL.myTalk) b.textContent = p.stage === "heard" ? "Plan talk" : "Talk plan"; list.append(n); });
   if (!mine.length) list.innerHTML = `<div style="padding:20px 4px;color:#6B6375;font-size:15px">Nothing here yet.</div>`;
+  $$("button, a", sc).forEach(b => { $$("*", b).concat([b]).filter(e => !e.children.length && e.textContent.trim() === "Talk card").forEach(e => e.textContent = "Talk plan"); });
+  $$("[data-topic]", sc).forEach(row => { const q = S.t[row.dataset.topic]; if (!q) return; const tx = $$("div", row).filter(d => !d.children.length && d.textContent.trim()); const sub = tx[1]; if (!sub) return;
+    const [cls, icn, txt] = q.stage === "done" ? ["st-done", "check", `Done · talked ${dayLabel(q.talked || today).replace("Tonight", "today")}`]
+      : q.stage === "planned" ? ["st-plan", "cal", `Talk ${dayLabel(q.date).replace("Tonight", "today")} · ${q.place}`]
+      : q.stage === "listening" ? ["st-go", "clock", sub.textContent.replace(/^Next: /, "").replace(/^./, c => c.toUpperCase())]
+      : q.stage === "heard" ? ["st-next", "plan", "Heard · plan your talk"] : ["st-saved", "bookmark", sub.textContent];
+    sub.className = "st " + cls; sub.innerHTML = `${ic(icn, 15)}<span>${esc(txt)}</span>`;
+    $$("button", row).forEach(b => { if (!b.classList.contains("btn-o")) { b.classList.add("btn-o"); b.style.height = "36px"; b.style.padding = "0 12px"; b.style.fontSize = "14px"; } }); });
 }
 function fillRow(n, t, sub){ const sq = n.querySelector("div div") || n.querySelector("div"); const ic = $$("div", n).find(d => (d.getAttribute("style") || "").includes("width: 56px")); if (ic) paint(ic, t, ICON_TALK.replace('width="56" height="56"', 'width="30" height="30"'));
   const tx = $$("div", n).filter(d => !d.children.length && d.textContent.trim()); if (tx[0]) tx[0].textContent = S.discreet ? t.category : (t.short || t.title); if (tx[1]) tx[1].textContent = sub; }
@@ -1108,41 +1361,82 @@ function drawTopicDetail(sc){
   const h = $("[data-b=tdheard]", sc); if (h) h.textContent = !ready(t) ? "Lesson coming soon" : ["heard", "planned", "done"].includes(p.stage) ? `Heard · ${t.duration_min} min` : `Chapter ${p.ch + 1} of ${t.lesson.chapters.length} · not finished`;
   const pl = $("[data-b=tdplan]", sc); if (pl) { pl.textContent = p.date ? `Plan · ${dayLabel(p.date).toLowerCase()}, ${p.place} · reminder 7:30 pm` : "Plan · not made yet"; const ln = pl.nextElementSibling; ln.textContent = ready(t) ? `"${p.custom || t.lesson.first_lines[p.line]}"` : ""; }
   const sb = $("[data-b=tdsavedbox]", sc); if (sb) { sb.style.display = p.saved.length ? "" : "none"; $("[data-b=tdsaved]", sc).textContent = p.saved.map(x => `"${x}"`).join("  "); }
+  // every talk the parent told Raise about, newest first
+  let lg = $("[data-b=tdlog]", sc);
+  if (!lg) { lg = document.createElement("div"); lg.dataset.b = "tdlog"; lg.setAttribute("style", "background:#FFFFFF;border-radius:18px;padding:14px 16px;margin:12px 0;font-size:14.5px;line-height:1.45"); const anchor = sb || $("[data-b=tdplan]", sc); if (anchor) (anchor.closest("div[style*='border-radius']") || anchor).after(lg); else $(".scroller", sc).append(lg); }
+  const log = (p.log || []).slice().reverse();
+  lg.style.display = log.length ? "" : "none";
+  lg.innerHTML = `<div style="font-size:13px;font-weight:700;color:#6B6375;margin-bottom:6px">Your talks</div>` + log.map(e => `<div style="padding:8px 0;border-top:1px solid #F1EAE1"><div style="font-weight:700">${esc(dayLabel(e.date).replace("Tonight", "Today"))}${e.resp ? " · " + esc(e.resp) : ""}${e.len ? " · " + esc(e.len) : ""}${e.feel ? " · you felt " + esc(e.feel.toLowerCase()) : ""}</div>${e.said ? `<div style="font-style:italic;color:#4A3F55">"${esc(e.said)}"</div>` : ""}${e.useful ? `<div style="font-size:13px;color:#6B6375">Reflection useful: ${e.useful} of 5</div>` : ""}</div>`).join("");
+}
+function drawRatings(sc, store){
+  $$("[data-rate]", sc).forEach(b => { const v = store && store[b.dataset.rate]; b.setAttribute("style", v === +b.dataset.n ? RT_ON : RT_OFF); b.setAttribute("aria-pressed", String(v === +b.dataset.n)); });
 }
 function drawNotes(sc){
   const box = $("[data-b=notes]", sc); box.innerHTML = "";
   if (!S.notes.length) { box.innerHTML = `<div style="background:#FFFFFF;border-radius:18px;padding:16px;font-size:15px;color:#6B6375">No notes yet. Add one only if you wish.</div>`; return; }
   S.notes.forEach((n, i) => { const c = clone(TPL.note), sp = c.querySelectorAll("span"); sp[0].textContent = n.about; sp[1].textContent = dayLabel(n.date).replace("Tonight", "Today"); $$("div", c).filter(d => !d.children.length).pop().textContent = n.text; c.querySelector("button").dataset.note = i; box.append(c); });
 }
+const RT = {
+  en: { thanks: "Thank you for trying.", asked: "They asked something back. That is a good sign: they were listening.", listened: "They listened. That is a good start.", time: "You made the time for it, and that counts.",
+    hardFb: "Thank you for trying. A first talk often goes like this, and it is not a failure. You opened the subject, and that is the hardest part.",
+    goodNext: "Keep the door open. Thank them, and agree to try it for a few days.", closeSay: "To close warmly, you could say", later: "Later today, you could say", then: "Then", nextTry: "Next time, you could start with", calm: "Come back to it in a day or two, when you are both calm." },
+  te: { thanks: "ప్రయత్నించినందుకు ధన్యవాదాలు.", asked: "వాళ్లు తిరిగి ఏదో అడిగారు. అది మంచి సంకేతం: వాళ్లు వింటున్నారు.", listened: "వాళ్లు విన్నారు. అది మంచి మొదలు.", time: "దీని కోసం మీరు సమయం కేటాయించారు, అదే ముఖ్యం.",
+    hardFb: "ప్రయత్నించినందుకు ధన్యవాదాలు. మొదటి సంభాషణ తరచుగా ఇలానే జరుగుతుంది, ఇది ఓటమి కాదు. మీరు విషయాన్ని మొదలుపెట్టారు, అదే అన్నిటికంటే కష్టమైన భాగం.",
+    goodNext: "సంభాషణకు దారి తెరిచే ఉంచండి. వాళ్లకు ధన్యవాదాలు చెప్పి, కొన్ని రోజులు ప్రయత్నించి చూద్దామని అంగీకరించండి.", closeSay: "ఆప్యాయంగా ముగించడానికి మీరు ఇలా చెప్పవచ్చు", later: "ఈ రోజు తర్వాత మీరు ఇలా చెప్పవచ్చు", then: "ఆ తర్వాత", nextTry: "తదుపరి సారి ఇలా మొదలుపెట్టవచ్చు", calm: "ఒకటి రెండు రోజుల్లో, ఇద్దరూ ప్రశాంతంగా ఉన్నప్పుడు మళ్లీ మాట్లాడండి." },
+  hi: { thanks: "कोशिश करने के लिए धन्यवाद।", asked: "उन्होंने पलटकर कुछ पूछा। यह अच्छा संकेत है: वे सुन रहे थे।", listened: "उन्होंने सुना। यह अच्छी शुरुआत है।", time: "आपने इसके लिए समय निकाला, और यही मायने रखता है।",
+    hardFb: "कोशिश करने के लिए धन्यवाद। पहली बातचीत अक्सर ऐसी ही होती है, और यह असफलता नहीं है। आपने बात शुरू की, और यही सबसे मुश्किल हिस्सा है।",
+    goodNext: "बातचीत का दरवाज़ा खुला रखें। उन्हें धन्यवाद कहें, और कुछ दिन इसे आज़माने पर सहमत हों।", closeSay: "प्यार से बात खत्म करने के लिए आप कह सकते हैं", later: "आज बाद में आप कह सकते हैं", then: "फिर", nextTry: "अगली बार आप ऐसे शुरू कर सकते हैं", calm: "एक-दो दिन में, जब आप दोनों शांत हों, फिर से बात करें।" } };
+const bubble = (lab, line) => `<div style="margin-top:10px"><div class="lab-ic" style="font-size:13px;font-weight:700;color:#5B3A8C;margin:0 0 4px 2px">${ic("say", 15)}${esc(lab)}</div><div class="say" style="padding:10px 14px;font-size:15.5px;line-height:1.4;color:#2A2233;margin-bottom:8px">"${esc(noCite(line))}"</div></div>`;
 function drawReflection(sc){
-  const t = T(), p = P(), d = p.debrief || {}, st = (t.lesson && t.lesson.second_try) || null, tc = (t.lesson && t.lesson.talk_card) || {};
+  if (!ready(T())) return;
+  const t = T(), p = P(), d = p.debrief || {}, X = LX(t), st = X.second_try || null, tc = X.talk_card || {};
+  const lg = X.lang || "en", W = RT[lg] || RT.en;
   const hard = ["Went quiet", "Walked off"].includes(d.resp) || d.feel === "Upset";
   const r1 = $("[data-b=rf1]", sc), r2 = $("[data-b=rf2]", sc);
   if (hard) {
-    if (r1) r1.textContent = st ? st.normal : "Thank you for trying. A first talk often goes like this, and it is not a failure. You opened the subject, and that is the hardest part.";
-    if (r2) r2.textContent = st ? `Later today you could say: "${st.repair_line}" Then: ${st.wait} Next time, try: "${st.new_way_in}"` : `${noCite(tc.if_it_goes_wrong || "")} Come back to it in a day or two, when you are both calm. Next time, try: "${t.lesson.first_lines[(p.line + 1) % 3]}"`;
+    if (r1) r1.textContent = st && st.normal ? noCite(st.normal) : W.hardFb;
+    if (r2) r2.innerHTML = st ? `${st.wait ? esc(W.then) + ": " + esc(noCite(st.wait)) : ""}${bubble(W.later, st.repair_line)}${bubble(W.nextTry, st.new_way_in)}`
+      : `${esc(W.calm)}${bubble(W.nextTry, X.first_lines[(p.line + 1) % 3])}`;
   } else {
-    if (r1) r1.textContent = `Thank you for trying. ${d.resp === "Asked something" ? "They asked something back. That is a good sign: they were listening." : d.resp === "Listened" ? "They listened. That is a good start." : "You made the time for it, and that counts."}`;
-    if (r2) r2.textContent = `${d.len ? `${d.len} was enough. ` : ""}${noCite(tc.close || "Keep the door open: thank them, and agree to try it for a few days.")}`;
+    if (r1) r1.textContent = `${W.thanks} ${d.resp === "Asked something" ? W.asked : d.resp === "Listened" ? W.listened : W.time}`;
+    if (r2) r2.innerHTML = `${esc(W.goodNext)}${tc.close ? bubble(W.closeSay, tc.close) : ""}`;
   }
   const next = TOPICS.find(x => x.slug !== t.slug && !(S.t[x.slug] && S.t[x.slug].stage !== "new"));
   const nt = $("[data-b=rfnext]", sc), why = $("[data-b=rfwhy]", sc);
   if (nt) { const cardEl = nt.closest("div[style*='border-radius']") || nt.parentElement; cardEl.style.display = next ? "" : "none"; if (next) { nt.textContent = next.title; if (why) why.textContent = ready(next) ? "Ready to listen now" : "Lesson being written"; cardEl.dataset.topic = next.slug; } }
+  // what the parent noted about the talk, shown back to them
+  let mine = $("[data-b=rfnote]", sc);
+  if (!mine && r2) { mine = document.createElement("div"); mine.dataset.b = "rfnote"; mine.setAttribute("style", "margin-top:12px;background:#FFFFFF;border-radius:14px;padding:12px 14px;font-size:14.5px;line-height:1.45;color:#2A2233"); r2.after(mine); }
+  if (mine) { const bits = [d.resp, d.len, d.feel && `you felt ${d.feel.toLowerCase()}`].filter(Boolean).join(" · ");
+    mine.style.display = bits || d.said ? "" : "none";
+    mine.innerHTML = `<div style="font-size:12.5px;font-weight:700;color:#6B6375;margin-bottom:4px">What you noted</div>${bits ? `<div>${esc(bits)}</div>` : ""}${d.said ? `<div style="margin-top:4px;font-style:italic">"${esc(d.said)}"</div>` : ""}`; }
+  drawRatings(sc, p.debrief);
   let btn = $("[data-act=secondtry]", sc);
-  if (!btn && r2) { btn = document.createElement("button"); btn.dataset.act = "secondtry"; btn.setAttribute("style", "border: none; font-family: inherit; cursor: pointer; height: 44px; padding: 0 18px; border-radius: 22px; background: #FDEBDD; color: #4A2C5A; font-size: 15px; font-weight: 700; margin-top: 12px; align-self: flex-start"); r2.after(btn); }
-  if (btn) { btn.textContent = hard ? "Plan a second try" : "Plan the next talk"; btn.style.display = ready(t) ? "" : "none"; }
+  if (!btn && r2) { btn = document.createElement("button"); btn.dataset.act = "secondtry"; btn.className = "btn-f"; btn.setAttribute("style", "margin-top:14px;align-self:flex-start"); (mine || r2).after(btn); }
+  if (btn) { const bl = hard ? "Plan a second try" : "Plan the next talk"; btn.setAttribute("aria-label", bl); btn.innerHTML = `${ic(hard ? "redo" : "plan", 17)}${bl}`; btn.style.display = ready(t) ? "" : "none"; }
+  // after rating (or 25 seconds), a small celebration offers the next topic
+  clearTimeout(drawReflection.tm); const cel = $("#celebrate"); if (cel && cel.dataset.for !== S.cur) cel.remove();
+  if (next && !p.celebrated) drawReflection.tm = setTimeout(() => celebrate(next), d.useful && d.pushed ? 900 : 25000);
+}
+function celebrate(next){
+  if (cur !== "Reflection" || $("#celebrate")) return; const p = P(); p.celebrated = true; save();
+  const c = document.createElement("div"); c.id = "celebrate"; c.dataset.for = S.cur; c.setAttribute("role", "dialog"); c.setAttribute("aria-label", "Next topic");
+  c.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><div><div style="font-size:20px;font-weight:700;color:#2A2233">🎉 You had the talk. Well done.</div><div style="font-size:14.5px;color:#6B6375;margin-top:4px">Most parents never take this first step. Ready for the next one?</div></div><button data-act="celclose" aria-label="Close" style="border:none;background:#F3EEE8;width:36px;height:36px;border-radius:18px;font-size:18px;cursor:pointer;flex:none">×</button></div>
+    <div data-topic="${esc(next.slug)}" style="margin-top:12px;display:flex;gap:12px;align-items:center;background:#FFF8F0;border-radius:16px;padding:10px;cursor:pointer"><div data-b="celsq" style="width:52px;height:52px;border-radius:12px;flex:none"></div><div><div style="font-size:12.5px;font-weight:700;color:#6B6375">Next for you</div><div style="font-size:15.5px;font-weight:700;color:#2A2233">${esc(next.title)}</div><div style="font-size:13px;color:#6B6375">${ready(next) ? `${next.duration_min} min · ready to listen` : "Lesson being written"}</div></div></div>
+    <div style="display:flex;gap:10px;margin-top:12px"><button data-act="celopen" data-slug="${esc(next.slug)}" style="flex:1;height:46px;border:none;border-radius:23px;background:#4A2C5A;color:#fff;font:700 16px var(--font);cursor:pointer">Open</button><button data-act="celclose" style="flex:1;height:46px;border:none;border-radius:23px;background:#F3EEE8;color:#4A2C5A;font:700 16px var(--font);cursor:pointer">Later</button></div>`;
+  $("#phone").append(c); scr("Reflection").classList.add("celebrating"); paint($("[data-b=celsq]", c), next, ICON_TALK.replace('width="56" height="56"', 'width="28" height="28"'));
 }
 function drawCommon(sc){
-  $$("[data-b=greet]", sc).forEach(g => g.textContent = g.textContent.startsWith("Welcome") ? "Welcome back" : greet());
+  $$("[data-b=greet]", sc).forEach(g => g.textContent = g.textContent.startsWith("Welcome") ? (firstName() ? `Welcome back, ${firstName()}` : "Welcome back") : greetName());
   const U = H.user ? H.user() : null;
   $$("[data-b=meName]", sc).forEach(e => e.textContent = (U && U.name) || "Parent"); $$("[data-b=meAvatar]", sc).forEach(e => e.textContent = ((U && U.name) || "P")[0].toUpperCase()); $$("[data-b=meSign]", sc).forEach(e => e.textContent = U && U.email ? "Signed in with Google" : U ? "Not signed in · saved securely for this phone" : "Not signed in · saved on this phone only");
-  $$("[data-v]", sc).forEach(e => { const k = e.dataset.v; e.textContent = k === "age" ? (S.age ? `${S.age} years` : "Not set") : k === "notes" ? (S.notes.length ? `${S.notes.length} ${S.notes.length === 1 ? "note" : "notes"}` : "None") : k === "discreet" ? (S.discreet ? "On" : "Off") : S[k]; });
+  $$("[data-v]", sc).forEach(e => { const k = e.dataset.v; e.textContent = k === "age" ? (S.age ? `${S.age} years` : "Not set") : k === "notes" ? (S.notes.length ? `${S.notes.length} ${S.notes.length === 1 ? "note" : "notes"}` : "None") : k === "discreet" ? (S.discreet ? "On · topic names hidden" : "Off · for shared phones") : k === "lang" ? ({ en: "English", te: "తెలుగు", hi: "हिन्दी" }[S.lang || "en"]) : S[k]; });
   $$("[data-b=email]", sc).forEach(e => e.textContent = (U && U.email) || "Not signed in yet");
 }
 
 /* ---------------- lesson player ---------------- */
 const CHS = () => L().chapters;
-const sentences = i => CHS()[i].text.match(/[^.!?]+[.!?]+["”']?|\S[^.!?]*$/g) || [CHS()[i].text];
+const sentences = i => CHS()[i].text.match(/[^.!?।]+[.!?।]+["”']?|\S[^.!?।]*$/g) || [CHS()[i].text];
 const mm = s => `${Math.floor(s / 60)}:${String(Math.round(s % 60)).padStart(2, "0")}`;
 function drawPlayer(sc){
   if (!ready(T())) return; const p = P(), c = CHS()[p.ch], N = CHS().length, total = c.secs, done = Math.min(total, total * (p.sent / sentences(p.ch).length));
@@ -1151,15 +1445,27 @@ function drawPlayer(sc){
   $$("[data-b=dots]", sc).forEach(d => d.innerHTML = CHS().map((_, i) => `<div style="${i < p.ch ? TPL.dot.done : i === p.ch ? TPL.dot.cur : TPL.dot.todo}"></div>`).join(""));
   $$("[data-b=t0]", sc).forEach(e => e.textContent = mm(done)); $$("[data-b=t1]", sc).forEach(e => e.textContent = "-" + mm(total - done));
   $$("[data-b=bar]", sc).forEach(e => e.style.width = Math.round(100 * done / total) + "%");
-  $$("[data-b=line]", sc).forEach(e => e.textContent = `"${L().say}"`);
+  $$("[data-b=line]", sc).forEach(e => e.textContent = `"${chLine(p.ch)}"`);
   $$("[data-b=playbtn]", sc).forEach(e => { e.innerHTML = playing ? TPL.pause : TPL.play; e.setAttribute("aria-label", playing ? "Pause" : "Play"); });
   const rb = $("[data-b=readbody]", sc);
-  if (rb) { rb.innerHTML = c.text.split(/\n+/).filter(Boolean).map(x => `<p style="${TPL.p}">${esc(x)}</p>`).join("") + TPL.box; $$("div", rb).forEach(d => { if (!d.children.length && d.textContent.trim().startsWith('"')) d.textContent = `"${L().say}"`; }); rb.style.zoom = { "Standard": 1, "Large": 1.12, "Extra large": 1.25 }[S.textSize]; }
+  if (rb) { rb.innerHTML = c.text.split(/\n+/).filter(Boolean).map(x => `<p style="${TPL.p}">${esc(x)}</p>`).join("") + TPL.box; $$("div", rb).forEach(d => { if (!d.children.length && d.textContent.trim().startsWith('"')) d.textContent = `"${chLine(p.ch)}"`; if (!d.children.length && d.textContent.trim() === "You could say") { d.innerHTML = `${ic("say", 15)}You could say`; d.classList.add("lab-ic"); } }); const bx = rb.lastElementChild; if (bx) { bx.classList.add("say"); const end = document.createElement("div"); end.className = "ch-end"; end.textContent = `End of chapter ${p.ch + 1}`; bx.before(end); } rb.style.zoom = { "Standard": 1, "Large": 1.12, "Extra large": 1.25 }[S.textSize]; }
   const pl = $("[data-b=partslist]", sc);
   if (pl) pl.innerHTML = CHS().map((x, i) => { const t = document.createElement("template"); t.innerHTML = i < p.ch ? TPL.parts.done : i === p.ch ? TPL.parts.cur : TPL.parts.todo; const b = t.content.firstElementChild, sp = b.querySelectorAll(":scope > span"); sp[0].textContent = i; sp[1].textContent = x.title; sp[sp.length - 1].textContent = mm(x.secs); if (i === p.ch && sp.length > 3) sp[2].textContent = playing ? "Playing" : "Paused"; b.dataset.ch = i; return b.outerHTML; }).join("");
   $$("[data-b=firstline]", sc).forEach(e => { if (!e.isContentEditable) e.textContent = `"${p.custom || L().first_lines[p.line]}"`; });
   $$("[data-b=remind]", sc).forEach(e => e.textContent = `${dayLabel(p.date || today)} 7:30 pm · shows as "Evening walk"`);
-  const sp = $("[data-b=sparks]", sc); if (sp && TPL.spark) { const qs = (L().sparks || []).filter(x => x.trim().endsWith("?")); const note = sp.querySelector("span"); sp.innerHTML = ""; qs.forEach((q, i) => { const b = clone(TPL.spark); b.textContent = q; b.setAttribute("style", i === (p.spark || 0) ? TPL.sparkOn : TPL.sparkOff); b.dataset.spark = i; sp.append(b); }); if (!qs.length) sp.insertAdjacentHTML("beforeend", `<span style="font-size:14px;color:#6B6375">Curiosity questions for this topic are being written.</span>`); if (note) sp.append(note); }
+  const sp = $("[data-b=sparks]", sc); if (sp && !sp.querySelector("[contenteditable=true]:focus")) { const qs = sparkList(), sel = p.spark == null ? 0 : p.spark;
+    sp.className = "fl-row"; sp.removeAttribute("style"); sp.innerHTML = "";
+    qs.forEach((q, i) => { const b = document.createElement("div"); b.className = "fl-card" + (sel === i ? " on" : ""); b.dataset.spark = i; b.setAttribute("role", "button"); b.innerHTML = `<small>Question ${i + 1} of ${qs.length}</small>${esc(q)}`; sp.append(b); });
+    const own = document.createElement("div"); own.className = "fl-card" + (sel === "custom" ? " on" : ""); own.dataset.spark = "custom"; own.setAttribute("role", "button");
+    own.innerHTML = `<small>Your own message</small><div data-b="ownmsg" contenteditable="true" style="min-height:44px;outline:none" aria-label="Write your own message">${esc(p.sparkOwn || "")}</div>`; sp.append(own);
+    let hint = sp.nextElementSibling && sp.nextElementSibling.dataset.b === "sparkhint" ? sp.nextElementSibling : null;
+    if (!hint) { hint = document.createElement("div"); hint.dataset.b = "sparkhint"; hint.setAttribute("style", "font-size:12.5px;color:#3D6B4E;margin:-4px 2px 8px"); sp.after(hint); }
+    hint.textContent = qs.length ? "Swipe for more. Only your message is sent, nothing about Raise." : "Questions for this topic are being written. You can write your own."; }
+  const fr = $("[data-b=flrow]", sc); if (fr && !fr.querySelector("[contenteditable=true]")) { const fl = L().first_lines || [];
+    fr.innerHTML = fl.map((x, i) => `<div class="fl-card${!p.custom && p.line === i ? " on" : ""}" data-fl="${i}" role="button"><small>Line ${i + 1} of ${fl.length}</small><span>"${esc(noCite(x))}"</span></div>`).join("")
+      + (p.custom ? `<div class="fl-card on" data-fl="custom" role="button"><small>Your words</small><span>"${esc(p.custom)}"</span></div>` : "");
+    const on = fr.querySelector(".on"); if (on && on.previousElementSibling) fr.scrollLeft = on.offsetLeft - 4; }
+  $$(".say", sc).forEach(b => { const now = b.textContent.slice(0, 60); if (b.dataset.last && b.dataset.last !== now) { b.classList.remove("pop"); void b.offsetWidth; b.classList.add("pop"); } b.dataset.last = now; });
   const pw = $("[data-b=pickweek]", sc); if (pw) { pw.innerHTML = ""; for (let i = 0; i < 7; i++) { const d = addDays(i), b = clone(TPL.pickDay), s = b.querySelectorAll("span"); if (s.length >= 2) { s[0].textContent = DAY[d.getDay()]; s[1].textContent = d.getDate(); } else b.textContent = `${DAY[d.getDay()]} ${d.getDate()}`; b.dataset.date = iso(d); b.setAttribute("style", iso(d) === (p.date || "") ? TPL.dayOn || b.getAttribute("style") : TPL.dayOff || b.getAttribute("style")); pw.append(b); } }
   $$("button", sc).filter(x => ["Today", "Tomorrow", "Pick a day"].includes(label(x))).forEach((x, i, all) => { const want = !p.date || p.date === today ? "Today" : p.date === iso(addDays(1)) ? "Tomorrow" : "Pick a day"; if (label(x) === want) choose(x); });
   const ps = $("[data-b=pswhen]", sc); if (ps) ps.textContent = `${dayLabel(p.date)}, ${p.place}`;
@@ -1167,20 +1473,47 @@ function drawPlayer(sc){
 }
 function drawTalk(sc){
   const t = T(), p = P(); if (!ready(t)) return;
-  $$("[data-b=firstline]", sc).forEach(e => e.textContent = `"${p.custom || t.lesson.first_lines[p.line]}"`);
+  $$("[data-b=firstline]", sc).forEach(e => e.textContent = `"${p.custom || LX(t).first_lines[p.line]}"`);
   $$("[data-b=when]", sc).forEach(e => e.textContent = `${dayLabel(p.date)} · ${p.place}`);
-  const wh = $("[data-b=tcwhyhead]", sc); if (wh) { wh.textContent = "If it goes wrong"; $("[data-b=tcwhy]", sc).textContent = noCite(t.lesson.talk_card.if_it_goes_wrong); }
+  const wh = $("[data-b=tcwhyhead]", sc); if (wh) { wh.textContent = "If it goes wrong"; $("[data-b=tcwhy]", sc).textContent = noCite(LX(t).talk_card.if_it_goes_wrong); }
   const db = $("[data-b=dbsub]"); if (db) db.textContent = `${t.short || t.title} · planned for ${dayLabel(p.date).toLowerCase()}`;
   const gp = $("[data-b=gatep]"); if (gp) gp.innerHTML = `You planned to talk about <strong>${esc((t.short || t.title).toLowerCase())}</strong> ${p.date === today ? "tonight" : "on " + dayLabel(p.date)}. Did you get to it?`;
+}
+function drawTalkPlan(sc){
+  const t = T(), p = P(); if (!ready(t)) return; const planned = p.stage === "planned", d0 = p.date || today;
+  $("[data-b=tptopic]", sc).textContent = (S.discreet ? t.category : (t.short || t.title)) + (planned ? ` · ${dayLabel(p.date)}, ${p.place}` : " · not planned yet");
+  const chip = on => (on ? TPL.chipOn : TPL.chipOff) + ";flex:0 0 auto;scroll-snap-align:start";
+  $("[data-b=tpdays]", sc).innerHTML = Array.from({ length: 7 }, (_, i) => { const d = addDays(i), v = iso(d), n = i === 0 ? "Today" : i === 1 ? "Tomorrow" : `${DAY[d.getDay()]} ${d.getDate()}`; return `<button data-tpday="${v}" aria-label="Day: ${n}" style="${chip(v === d0)}">${n}</button>`; }).join("");
+  $("[data-b=tpplaces]", sc).innerHTML = ["after school", "after dinner", "on a walk", "on a phone call"].map(x => `<button data-tpplace="${x}" aria-label="Place: ${x}" style="${chip(x === p.place)}">${x[0].toUpperCase() + x.slice(1)}</button>`).join("");
+  $("[data-b=tpremind]", sc).innerHTML = `${ic("bell", 15)} Reminder ${esc(dayLabel(d0).replace("Tonight", "today"))} at 7:30 pm · shows as "Evening walk"`;
+  const box = $("[data-b=wabox]", sc); if (box) box.style.display = p.waOpen ? "" : "none"; const wt = $("[data-act=watoggle]", sc); if (wt) wt.setAttribute("aria-expanded", String(!!p.waOpen));
+  const sv = $("[data-act=tpsave]", sc), tk = $("[data-act=tptalked]", sc), nt = $("[data-act=tpnot]", sc);
+  if (sv) sv.style.display = planned ? "none" : "";
+  if (tk) { if (!tk.dataset.full) tk.dataset.full = tk.getAttribute("style"); tk.setAttribute("style", planned ? tk.dataset.full : nt ? nt.getAttribute("style") : tk.dataset.full); tk.textContent = planned ? "We talked" : "We already talked"; }
+  if (nt) nt.style.display = planned ? "" : "none";
 }
 function drawClosing(sc){
   const t = T(); if (!ready(t)) return; const ul = $("[data-b=srclist]", sc);
   ul.innerHTML = ""; t.lesson.sources.forEach(s => { const li = clone(TPL.src), sp = li.querySelectorAll("span"); sp[0].textContent = (s.publisher || "").slice(0, 48); sp[1].innerHTML = `<a href="${esc(s.url)}" target="_blank" rel="noopener" style="color:inherit">${esc(s.title)} · ${s.year}</a>`; ul.append(li); });
   const ct = $("[data-b=cltitle]", sc); if (ct) ct.textContent = `${t.short || t.title} · ${t.duration_min} min`;
+  drawRatings(sc, P().lessonRating || {});
 }
 
+function drawLang(sc, id){
+  // the old one-way "Show in Telugu" button is replaced by the three-language switch
+  $$("button", sc).filter(b => /^Show in (Telugu|English)$/.test(label(b))).forEach(b => b.style.display = "none");
+  const lg = S.lang || "en", t = T();
+  $$("[data-b=langbar]", sc).forEach(bar => { $$("button", bar).forEach(b => b.setAttribute("style", b.dataset.lang === lg ? LB_ON : LB_OFF));
+    let note = bar.querySelector("[data-b=langnote]"); if (!note) { note = document.createElement("div"); note.dataset.b = "langnote"; note.setAttribute("style", "flex-basis:100%;font-size:12.5px;color:#6B6375"); bar.append(note); }
+    note.textContent = lg !== "en" && t && ready(t) && !hasLang(t, lg) ? `The ${LANG_NAME[lg]} version of this lesson is still being checked, so it shows in English for now.` : lg !== "en" ? "Beta: lesson text in your language. Buttons stay in English for now." : ""; });
+  if (id === "Language") {
+    $$("button", sc).forEach(b => { const k = label(b), lg = /Telugu|తెలుగు/.test(k) ? "te" : /Hindi|हिन्दी/.test(k) ? "hi" : /^English/.test(k) ? "en" : null; if (!lg) return;
+      $$("*", b).filter(e => !e.children.length && /Coming soon|Beta/.test(e.textContent)).forEach(e => e.textContent = "Beta");
+      if (lg === (S.lang || "en") && !b.dataset.on) { choose(b); } b.dataset.on = lg === (S.lang || "en") ? "1" : ""; });
+  }
+}
 function fill(sc){
-  drawCommon(sc); const id = sc.id.slice(2);
+  drawCommon(sc); const id = sc.id.slice(2); drawLang(sc, id); drawLangBtns(sc);
   if (["Home", "Offline", "Gate", "Preview"].includes(id)) drawHome(sc);
   if (id === "Preview") drawPreview(sc);
   if (id === "SeeAll") drawSeeAll(sc);
@@ -1193,23 +1526,27 @@ function fill(sc){
   if (id === "Closing") drawClosing(sc);
   if (["Player", "Read", "Parts", "Doubt", "Boundary", "Ready", "PickDay", "Spark", "PlanSaved"].includes(id)) drawPlayer(sc);
   if (["TalkCard", "Debrief", "Gate", "PlanSaved", "TopicDetail"].includes(id)) drawTalk(sc);
+  if (id === "TalkCard") { drawPlayer(sc); drawTalkPlan(sc); }
 }
 
 /* ---------------- navigation ---------------- */
 const hist = []; let cur = null;
 function show(id, push = true){
-  if (!scr(id)) return;
+  if (!scr(id)) return; closeLangMenu(); clearTimeout(drawReflection.tm); { const c = $("#celebrate"); if (c) c.remove(); const r = scr("Reflection"); if (r) r.classList.remove("celebrating"); }
   if (id === "MyTopics" && !myTopics().length) id = "TopicsEmpty";
   if (id === "Home" && S.gateFor && S.t[S.gateFor] && S.t[S.gateFor].stage === "planned") { S.cur = S.gateFor; S.gateFor = null; save(); id = "Gate"; }
   if (["Player", "Read", "Parts", "Ready", "PickDay", "Spark", "Closing", "TalkCard"].includes(id) && !ready(T())) { toast("This lesson is still being written."); return; }
-  if (cur && push && cur !== id) hist.push(cur);
+  // history is a stack: going to a screen already in it cuts back to it, so Back never loops (e.g. Family note ⇄ Add note)
+  if (cur && push && cur !== id) { const k = hist.indexOf(id); if (k >= 0) hist.splice(k); else hist.push(cur); }
   $$(".screen").forEach(s => s.hidden = true); const sc = scr(id); sc.hidden = false; cur = id; fill(sc);
   $$("#index button").forEach(b => b.setAttribute("aria-current", b.dataset.jump === id));
   if (location.hash.slice(1) !== id) history.replaceState(null, "", "#" + id);
+  fitScroll(sc, true);
   if (H.view) H.view(id, S.cur);
+  if (id === "TalkCard" && !S.seenPlan) { S.seenPlan = true; save(); setTimeout(() => toast("Your talk plan: what to say, when, a WhatsApp warm-up, and what to do if it goes wrong. All in one place."), 400); }
 }
 const back = fb => { const p = hist.pop(); show(p || fb || "Home", false); };
-const refresh = () => { const s = scr(cur); if (s) fill(s); };
+const refresh = () => { const s = scr(cur); if (s) { fill(s); fitScroll(s, false); } };
 function openTopic(slug, where = "Preview"){ S.cur = slug; save(); show(where); }
 
 /* ---------------- listening ---------------- */
@@ -1228,12 +1565,14 @@ function speak(){
   }
   if (!("speechSynthesis" in window)) { stop(); refresh(); toast("This browser cannot read aloud. Tap Read."); return; }
   const ss = sentences(p.ch); if (p.sent >= ss.length) return nextChapter();
-  const u = new SpeechSynthesisUtterance(ss[p.sent]); u.lang = "en-IN"; u.rate = 0.95 * S.rate;
+  const u = new SpeechSynthesisUtterance(ss[p.sent]); const lc = LANG_CODE[L().lang || "en"]; u.lang = lc; u.rate = 0.95 * S.rate;
+  const vs = speechSynthesis.getVoices(), v = vs.find(x => x.lang.replace("_", "-").toLowerCase() === lc.toLowerCase()) || vs.find(x => x.lang.toLowerCase().startsWith(lc.slice(0, 2)));
+  if (v) u.voice = v; else if (lc !== "en-IN" && !speak.warned) { speak.warned = true; toast(`This phone has no ${LANG_NAME[L().lang]} voice. Tap Read to follow along, or add ${LANG_NAME[L().lang]} in your phone's text-to-speech settings.`); }
   u.onend = () => { if (!playing) return; p.sent++; save(); refresh(); speak(); };
   speechSynthesis.speak(u);
 }
 function togglePlay(){ if (playing) { stop(); return refresh(); } const p = P(); playing = true; if (["new", "saved"].includes(p.stage)) p.stage = "listening"; save(); refresh(); speak(); }
-function jump(d){ const p = P(); if (el && audioOK && !el.paused) { el.currentTime = Math.max(0, el.currentTime + 10 * d); return; }
+function jump(d){ if (!ready(T())) return; const p = P(); if (el && audioOK && !el.paused) { el.currentTime = Math.max(0, el.currentTime + 10 * d); return; }
   if (d < 0 && p.sent === 0) return toast("This is the start of the chapter.");
   try { speechSynthesis.cancel(); } catch (e) {} p.sent = Math.max(0, Math.min(sentences(p.ch).length - 1, p.sent + d)); save(); refresh(); if (playing) setTimeout(speak, 80); }
 function goChapter(i){ stop(); const p = P(); p.ch = i; p.sent = 0; piece = 0; if (el) el.removeAttribute("src"); if (["new", "saved"].includes(p.stage)) p.stage = "listening"; save(); }
@@ -1282,11 +1621,11 @@ const GO = {
   Home: { "Help": "Help", "Not today": "NotYet" }, Offline: { "Help": "Help", "Not today": "NotYet" },
   Gate: { "Close": "Home", "Ask me later": "Home", "Yes, tell Raise how it went": "Debrief", "Not yet, move it": "NotYet" },
   SearchBoundary: {}, Preview: { "Close": "Home" },
-  Player: { "Minimise": "Home", "Ask a doubt": "Doubt", "I am ready to talk": "Ready" }, Read: { "Minimise": "Home", "Ask a doubt": "Doubt", "I am ready to talk": "Ready" },
-  Closing: { "Minimise": "Home", "I am ready to talk": "Ready", "Not now": "Home" },
+  Player: { "Minimise": "Home", "Ask a doubt": "Doubt", "I am ready to talk": "TalkCard" }, Read: { "Minimise": "Home", "Ask a doubt": "Doubt", "I am ready to talk": "TalkCard" },
+  Closing: { "Minimise": "Home", "I am ready to talk": "TalkCard", "Not now": "Home" },
   Ready: { "Pick a day": "PickDay" }, Spark: { "Pick a day": "PickDay" }, PickDay: {},
   PlanSaved: { "Close": "MyTopics", "Done": "MyTopics", "Undo": "Ready" },
-  TopicDetail: { "Open talk card": "TalkCard", "Change plan": "Ready", "We talked": "Debrief" }, TopicsEmpty: { "Find a topic": "Home" },
+  TopicDetail: { "Open talk card": "TalkCard", "Open talk plan": "TalkCard", "Change plan": "TalkCard", "We talked": "Debrief" }, TopicsEmpty: { "Find a topic": "Home" },
   TalkCard: { "We talked": "Debrief", "Not today": "NotYet" },
   Debrief: { "Close": "MyTopics", "We have not talked yet": "NotYet" },
   NotYet: { "Close": "TalkCard" }, Reflection: { "Close": "MyTopics", "Later": "MyTopics" },
@@ -1301,11 +1640,24 @@ const PLAYER_FAMILY = ["Player", "Parts", "Doubt", "Boundary", "Ready", "PickDay
 function handle(t){
   const k = label(t), sc = cur, p = P();
   if (H.click && H.click(sc, k, t)) return;
+  // lesson controls do nothing for a topic whose lesson is still being written
+  if (PLAYER_FAMILY.concat(["Read", "Closing", "TalkCard"]).includes(sc) && !ready(T()) && !t.closest("nav") && !t.dataset.overlay && !["Close", "Minimise", "Back"].includes(k)) return toast("This lesson is still being written.");
   if (t.dataset.overlay) { const c = $$("button", scr(sc)).find(b => ["Close", "Minimise"].includes(label(b)) && !b.closest("[data-overlay]")); if (sc === "Preview") return show("Home"); if (sc === "Gate") return show("Home"); return SHEETS_OVER_ME.includes(sc) ? back("Me") : (c ? handle(c) : back()); }
   if (t.closest("nav")) { const to = { "Home": "Home", "My topics": "MyTopics", "Me": "Me" }[k]; if (to) { stop(); hist.length = 0; if (to === "Home") S.filter = "All"; return show(to); } }
   if (t.tagName === "A" && SHEETS_OVER_ME.concat(["Me"]).includes(sc)) { for (const [pre, to] of Object.entries(ME)) if (k.startsWith(pre)) return sc === to ? toast("You are here.") : show(to); }
   if (SHEETS_OVER_ME.includes(sc) && k === "Close") return back("Me");
-  if (k === "Back") { stop(); return back(sc === "Phone" ? "Main" : "Home"); }
+  // lesson language, from any lesson screen
+  if (t.dataset.lang) { const lg = t.dataset.lang; if ((S.lang || "en") === lg) return; stop(); S.lang = lg; Object.values(S.t).forEach(q => { q.sent = 0; }); save(); refresh();
+    const x = T(), inLesson = PLAYER_FAMILY.concat(["Read", "Preview", "TalkCard", "Closing"]).includes(sc), n = TOPICS.filter(y => ready(y) && hasLang(y, lg)).length;
+    if (lg === "en") return toast("Lessons in English.");
+    return toast(inLesson && x && ready(x) && !hasLang(x, lg) ? `This lesson's ${LANG_NAME[lg]} version is still being checked, so it stays in English for now. ${n} other lessons are ready in ${LANG_NAME[lg]}.` : `Lessons in ${LANG_NAME[lg]} (beta): ${n} ready. Buttons stay in English for now.`); }
+  // ratings 1 to 5; tapping the chosen number again clears it
+  if (t.dataset.rate) { const store = sc === "Closing" ? (p.lessonRating = p.lessonRating || {}) : p.debrief; const v = +t.dataset.n;
+    if (store[t.dataset.rate] === v) delete store[t.dataset.rate]; else store[t.dataset.rate] = v;
+    if (sc === "Reflection" && p.log && p.log.length) p.log[p.log.length - 1][t.dataset.rate] = store[t.dataset.rate];
+    save(); if (H.rate) H.rate(t.dataset.rate, store[t.dataset.rate] || null, S.cur); refresh(); return store[t.dataset.rate] ? toast("Thank you. This helps Raise improve.") : toast("Cleared."); }
+  if (k === "Back" && sc === "FamilyNote") { hist.length = 0; return show("Me"); }
+  if (k === "Back") { stop(); return back(sc === "Phone" ? "Main" : sc === "TalkCard" || sc === "TopicDetail" ? "MyTopics" : "Home"); }
   if (k === "Terms") return toast("Raise gives information for parents, not medical or legal advice. In danger, call 1098 or 14416.");
   if (k.startsWith("Send the code again")) return toast("You can ask for a new code in 0:24.");
   if (k.startsWith("Call me and read the code")) return toast("An automated call reads the code aloud. It needs the hosted app.");
@@ -1324,20 +1676,28 @@ function handle(t){
   if (t.dataset.cat) { S.filter = t.dataset.cat; return refresh(); }
   if (t.dataset.see) { S.seeCat = t.dataset.see; return show("SeeAll"); }
   if (t.dataset.browse) { const i = $("#s-Search input"); i.value = t.dataset.browse; return refresh(); }
-  if (t.dataset.topic && t.tagName === "A") return openTopic(t.dataset.topic);
-  if (k === "Open talk card") { const nc = t.closest("[data-topic]"); if (nc) S.cur = nc.dataset.topic; return show("TalkCard"); }
+  if (t.dataset.topic && (t.tagName === "A" || (t.tagName !== "BUTTON" && sc !== "MyTopics"))) return openTopic(t.dataset.topic);
+  if (k === "Open talk card" || k === "Open talk plan") { const nc = t.closest("[data-topic]"); if (nc) S.cur = nc.dataset.topic; return show("TalkCard"); }
   if (k === "Play" && ["Home", "Offline", "Gate", "Preview"].includes(sc)) { const mc = t.closest("[data-topic]"); if (mc) S.cur = mc.dataset.topic; return show("Player"); }
   if (k === "Clear search") { $(`#s-${sc} input`).value = ""; if (sc === "SearchBoundary") return show("Search"); return refresh(); }
-  if (k === "Ask Raise to add this topic") return toast("Request noted. The topic finder adds topics that many parents need.");
+  if (k === "Ask Raise to add this topic") { const q = (($(`#s-${sc} input`) || {}).value || "").trim();
+    if (!q) return toast("Type the topic in the search box first.");
+    if (!H.request) return toast("Request noted on this phone.");
+    H.request(q, S.lang || "en").then(ok => toast(ok ? `Sent: "${q}". The topic finder reads what parents ask for when it chooses new topics.` : "Could not send right now. Please try again when you are online."));
+    return; }
   if (sc === "Preview" && ["Listen", "Read instead"].includes(k)) { if (!ready(T())) return toast("This lesson is still being written. It appears here once it passes its checks."); if (["new"].includes(p.stage)) p.stage = "listening"; save(); return show(k === "Listen" ? "Player" : "Read"); }
-  if (k === "Save for later") { if (p.stage === "new") p.stage = "saved"; save(); return toast("Saved to My topics."); }
+  if (t.dataset.act === "savelater" || k === "Save for later") {
+    if (p.stage === "saved") { p.stage = "new"; save(); refresh(); return toast("Removed from Saved."); }
+    if (["new", "removed"].includes(p.stage)) { p.stage = "saved"; save(); refresh(); return toast("Saved. Find it in My topics, under Saved."); }
+    return toast("This topic is already in My topics."); }
 
   // lesson
   if (t.dataset.ch !== undefined) { goChapter(+t.dataset.ch); return show(S.from || "Player"); }
   if (["Pause", "Play"].includes(k) && PLAYER_FAMILY.includes(sc)) return togglePlay();
+  if (k === "Previous chapter") { stop(); if (p.ch > 0) { goChapter(p.ch - 1); return refresh(); } return toast("This is the first chapter."); }
   if (k === "Back 10 seconds") return jump(-1);
   if (k === "Forward 10 seconds") return jump(1);
-  if (k === "Save this line") { if (!p.saved.includes(L().say)) p.saved.push(L().say); save(); return toast("Line saved. It waits in this topic in My topics."); }
+  if (k === "Save this line") { const ln = chLine(p.ch); if (p.saved.includes(ln)) return toast("You already saved this line."); p.saved.push(ln); save(); return toast("Line saved. It waits in this topic in My topics."); }
   if (/^(0\.8|1|1\.25)x$/.test(k)) { S.rate = parseFloat(k); if (el) el.playbackRate = S.rate; save(); choose(t); return toast(`Speed ${k}`); }
   if (k === "Next chapter") { stop(); if (p.ch < CHS().length - 1) { goChapter(p.ch + 1); return refresh(); } if (["listening", "saved", "new"].includes(p.stage)) p.stage = "heard"; save(); return show("Closing"); }
   if (k === "Read" && sc !== "Read") { stop(); S.from = "Read"; return show("Read"); }
@@ -1351,45 +1711,71 @@ function handle(t){
   if (sc === "Doubt" && PRESET[k]) { answer(PRESET[k]); $("[data-b=dq]").textContent = k; return; }
   if (k === "Go to: How to begin") { goChapter(5); return show("Player"); }
   if (k === "Get help") return show("Help");
-  if (k === "I am ready to talk") { stop(); return show("Ready"); }
+  if (k === "I am ready to talk") { stop(); return show("TalkCard"); }
 
   // plan
   if (k === "See 2 other lines") { p.line = (p.line + 1) % L().first_lines.length; p.custom = null; save(); return refresh(); }
   if (k === "Edit line") { const f = $(`#s-${sc} [data-b=firstline]`); f.contentEditable = "true"; f.focus(); return toast("Type your own words, then tap Save my plan."); }
-  if (k === "Show in Telugu") return toast("Telugu lessons are coming soon.");
+  if (k === "Show in Telugu") { if (!hasLang(T(), "te")) return toast("The Telugu version of this lesson is still being prepared."); S.lang = "te"; save(); refresh(); return toast("Showing this lesson in Telugu (beta)."); }
+  if (k === "Show in English") { S.lang = "en"; save(); refresh(); return toast("Showing this lesson in English."); }
   if (t.getAttribute("role") === "switch") { const on = t.getAttribute("aria-checked") === "true";
-    if (k.startsWith("Send a curiosity question")) return show(on ? "Ready" : "Spark");
+    if (k.startsWith("Send a curiosity question") || k.startsWith("Warm up on WhatsApp")) return show(on ? "Ready" : "Spark");
     if (k.startsWith("Hide topic names")) { S.discreet = !on; save(); }
     t.setAttribute("aria-checked", String(!on)); const knob = t.lastElementChild; if (knob) { knob.style.background = !on ? "#4A2C5A" : "#D8CFDD"; const dot = knob.firstElementChild; if (dot) dot.style.transform = !on ? "translateX(0)" : "translateX(-20px)"; }
     return toast(`${k.split(" ").slice(0, 4).join(" ")}: ${on ? "off" : "on"}.`); }
   if (["Today", "Tomorrow"].includes(k) && ["Ready", "Spark", "PickDay"].includes(sc)) { p.date = iso(addDays(k === "Today" ? 0 : 1)); choose(t); save(); return refresh(); }
   if (t.dataset.date) { p.date = t.dataset.date; save(); return refresh(); }
-  if (t.dataset.spark !== undefined) { p.spark = +t.dataset.spark; save(); return refresh(); }
+  if (t.dataset.spark !== undefined) { p.spark = t.dataset.spark === "custom" ? "custom" : +t.dataset.spark; save(); $$("[data-spark]", t.parentElement).forEach(c => c.classList.toggle("on", c === t)); if (p.spark === "custom") { const m = $("[data-b=ownmsg]", t); if (m && document.activeElement !== m) m.focus(); } return; }
+  if (t.dataset.fl !== undefined) { if (t.dataset.fl !== "custom") { p.line = +t.dataset.fl; p.custom = null; } save(); $$("[data-fl]", t.parentElement).forEach(c => c.classList.toggle("on", c === t)); return; }
+  if (t.dataset.act === "editline") { const fr = $(`#s-${sc} [data-b=flrow]`), on = fr && (fr.querySelector(".on") || fr.firstElementChild); if (!on) return; const span = on.querySelector("span"); span.contentEditable = "true"; span.focus(); try { getSelection().selectAllChildren(span); } catch (er) {} return toast("Type your own words, then tap Save my plan."); }
+  if (t.dataset.act === "wasend") { const msg = p.spark === "custom" ? (p.sparkOwn || "").trim() : sparkList()[p.spark || 0];
+    if (!msg) return toast("Write your message first, or pick a question.");
+    window.open("https://wa.me/?text=" + encodeURIComponent(msg), "_blank", "noopener"); p.sparkSent = today; save(); if (H.rate) H.rate("spark_sent", 1, S.cur);
+    return toast("WhatsApp opens with your message. Pick your teen's chat. Nothing about Raise is included."); }
+  if (t.dataset.tpday) { p.date = t.dataset.tpday; save(); refresh(); return toast(`${dayLabel(p.date).replace("Tonight", "Today")}, ${p.place}.${p.stage === "planned" ? " Plan updated." : ""}`); }
+  if (t.dataset.tpplace) { p.place = t.dataset.tpplace; save(); return refresh(); }
+  if (t.dataset.act === "watoggle") { p.waOpen = !p.waOpen; save(); return refresh(); }
+  if (t.dataset.act === "tpclose") return back("MyTopics");
+  if (t.dataset.act === "tpsave") { const f = $(`#s-${sc} [data-b=flrow] [contenteditable=true]`); if (f) { f.contentEditable = "false"; const v = f.textContent.replace(/^["“]|["”]$/g, "").trim(); if (v && v !== noCite(L().first_lines[p.line])) p.custom = v; }
+    p.date = p.date || today; p.stage = "planned"; S.gateFor = S.cur; save(); refresh(); return toast(`Plan saved: ${dayLabel(p.date).replace("Tonight", "today")}, ${p.place}. Reminder at 7:30 pm. It waits in My topics.`); }
+  if (t.dataset.act === "tptalked") return show("Debrief");
+  if (t.dataset.act === "tpnot") return show("NotYet");
+  if (t.dataset.act === "celopen") { const c = $("#celebrate"); if (c) c.remove(); return openTopic(t.dataset.slug); }
+  if (t.dataset.act === "celclose") { const c = $("#celebrate"); if (c) c.remove(); scr("Reflection").classList.remove("celebrating"); return; }
   if (["After school", "After dinner", "On a walk", "On a phone call"].includes(k)) { p.place = k.toLowerCase(); choose(t); save(); return; }
-  if (k === "Save my plan" || k === "Save and choose where to send") { const f = $(`#s-${sc} [data-b=firstline]`); if (f && f.isContentEditable) { f.contentEditable = "false"; const v = f.textContent.replace(/^"|"$/g, "").trim(); if (v && v !== L().first_lines[p.line]) p.custom = v; }
-    p.date = p.date || today; p.stage = "planned"; S.gateFor = S.cur; save(); if (k.startsWith("Save and")) toast("On a phone, WhatsApp opens with the question ready to send."); return show("PlanSaved"); }
+  if (k === "Save my plan" || k === "Save and choose where to send") { const f = $(`#s-${sc} [data-b=flrow] [contenteditable=true]`) || $(`#s-${sc} [data-b=firstline][contenteditable=true]`); if (f) { f.contentEditable = "false"; const v = f.textContent.replace(/^["“]|["”]$/g, "").trim(); if (v && v !== noCite(L().first_lines[p.line])) p.custom = v; }
+    p.date = p.date || today; p.stage = "planned"; S.gateFor = S.cur; save();
+    if (k.startsWith("Save and")) { const q = sparkList()[p.spark || 0];
+      if (q) { window.open("https://wa.me/?text=" + encodeURIComponent(q), "_blank", "noopener"); toast("WhatsApp opens with the question. Pick your teen's chat. Only the question is sent, nothing about Raise."); } }
+    return show("PlanSaved"); }
 
   // my topics and after the talk
   if (t.dataset.day) { const has = myTopics().find(([s, q]) => q.date === t.dataset.day && q.stage === "planned"); $$("button", t.parentElement).forEach(b => b.setAttribute("style", b === t ? TPL.dayOn : TPL.dayOff)); return toast(has ? `${dayLabel(t.dataset.day)}: talk about ${(bySlug(has[0]).short || bySlug(has[0]).title).toLowerCase()}` : `${dayLabel(t.dataset.day)}: no talk planned.`); }
   if (sc === "MyTopics" && ["All", "To talk", "To finish", "Done", "Saved"].includes(k)) { S.myFilter = k; save(); return refresh(); }
   if (sc === "MyTopics") { const row = t.closest("[data-topic]"); if (row) { S.cur = row.dataset.topic; const q = P(); save();
-      if (k === "Talk card") return show("TalkCard"); if (k === "Plan talk") return show("Ready"); if (k === "Continue lesson") return show("Player"); if (k === "Tell Raise") return show("Debrief"); return show("TopicDetail"); } }
+      if (["Talk card", "Talk plan", "Plan talk"].includes(k)) return show("TalkCard"); if (k === "Continue lesson") return show("Player"); if (k === "Tell Raise") return show("Debrief"); return show("TopicDetail"); } }
   if (k === "Listen again") { goChapter(0); return show("Player"); }
   if (k === "Remove from My topics") { p.stage = "removed"; save(); toast("Removed. You can find it again on Home."); return show("MyTopics"); }
   if (sc === "Debrief" && t.tagName === "BUTTON" && !["Close", "See my reflection", "We have not talked yet"].includes(k)) { choose(t); const grp = t.parentElement.previousElementSibling ? t.parentElement.previousElementSibling.textContent : ""; const key = grp.includes("long") ? "len" : grp.includes("respond") ? "resp" : "feel"; p.debrief[key] = k; save(); return; }
-  if (k === "See my reflection") { p.debrief.said = ($("#s-Debrief textarea").value || "").trim(); p.stage = "done"; p.talked = today; p.tries = (p.tries || 0) + 1; save(); return show("Reflection"); }
-  if (t.dataset.act === "secondtry") { p.stage = "heard"; p.line = (p.line + 1) % 3; if (L().second_try) p.custom = L().second_try.new_way_in; p.date = iso(addDays(2)); save(); toast("A second try, two days from now. You can change the day."); return show("Ready"); }
+  if (k === "See my reflection") { p.debrief.said = ($("#s-Debrief textarea").value || "").trim(); p.stage = "done"; p.talked = today; p.tries = (p.tries || 0) + 1;
+    p.log = p.log || []; p.log.push({ date: today, len: p.debrief.len || null, resp: p.debrief.resp || null, feel: p.debrief.feel || null, said: p.debrief.said || "" });
+    delete p.debrief.useful; delete p.debrief.pushed; $("#s-Debrief textarea").value = ""; save(); return show("Reflection"); }
+  if (t.dataset.act === "secondtry") { p.stage = "heard"; p.line = (p.line + 1) % 3; if (L().second_try) p.custom = L().second_try.new_way_in; p.date = iso(addDays(2)); save(); toast("A second try, two days from now. You can change the day."); return show("TalkCard"); }
   if (sc === "Reflection" && ["Yes", "No"].includes(k)) { choose(t); return toast("Thank you. This shapes your next reflection."); }
   if (sc === "Reflection" && k === "Open") { const c = t.closest("[data-topic]"); if (c) return openTopic(c.dataset.topic); return show("Home"); }
   if (sc === "NotYet" && ["Later today", "Tomorrow", "Pick a day"].includes(k)) { choose(t); if (k === "Pick a day") return show("PickDay"); p.date = iso(addDays(k === "Tomorrow" ? 1 : 0)); save(); return; }
   if (k === "Move my plan to tomorrow") { p.date = p.date && p.date > today ? p.date : iso(addDays(1)); p.stage = "planned"; save(); toast(`Moved to ${dayLabel(p.date).toLowerCase()}.`); return show("MyTopics"); }
   if (k === "Drop this plan") { p.stage = "heard"; p.date = null; save(); toast("Plan dropped. The lesson stays in My topics."); return show("MyTopics"); }
   if (sc === "Closing" && ["Yes", "No"].includes(k)) return toast("Thank you. This helps Raise improve the lesson.");
-  if (k === "Share this topic with another parent") { try { navigator.clipboard.writeText(`${T().title}: a ${T().duration_min}-minute lesson on Raise for parents of teenagers.`).then(() => toast("Copied. Paste it in a message to another parent."), () => toast("Copy is blocked here. On a phone this opens the share sheet.")); } catch (er) { toast("On a phone this opens the share sheet."); } return; }
+  if (k === "Share this topic with another parent") { const x = T(), url = location.origin + location.pathname;
+    const msg = `I found this useful for talking with my teenager:\n\n*${x.title}*\nA free ${x.duration_min}-minute lesson, checked against research, that gives you the first sentence to start the talk. Available in English, తెలుగు and हिन्दी.${ready(x) ? `\n\nTry this line: "${LX(x).first_lines[0]}"` : ""}\n\n${url}`;
+    window.open("https://wa.me/?text=" + encodeURIComponent(msg), "_blank", "noopener"); if (H.rate) H.rate("share_topic", 1, x.slug); return toast("WhatsApp opens with the lesson, a first line to try, and the link. Choose the parent to send it to."); }
 
   // me
   if (k === "Call") { const n = (t.closest("div").parentElement.textContent.match(/1098|14416|1930/) || [""])[0]; return toast(`On a phone this calls ${n}. Raise does not record the call.`); }
-  if (sc === "Language") { if (/Coming soon/.test(k)) return toast("Hindi and Telugu lessons are coming soon."); if (k === "English") return toast("English is on."); }
+  if (sc === "Language" && t.tagName === "BUTTON") { const lg = /Telugu|తెలుగు/.test(k) ? "te" : /Hindi|हिन्दी/.test(k) ? "hi" : /^English/.test(k) ? "en" : null;
+    if (lg) { stop(); S.lang = lg; save(); refresh(); const n = TOPICS.filter(x => ready(x) && (lg === "en" || hasLang(x, lg))).length;
+      return toast(lg === "en" ? "Lessons in English." : `Lessons in ${LANG_NAME[lg]} (beta): ${n} ready. Others stay in English until their ${LANG_NAME[lg]} version is checked. Screens stay in English for now.`); } }
   if (["Standard", "Large", "Extra large"].includes(k)) { S.textSize = k; choose(t); save(); return toast(`Text size: ${k}. Lesson text uses it.`); }
   if (sc === "Lens" && t.tagName === "BUTTON" && !k.startsWith("Not listed") && k !== "Close") { choose(t); S.lens = k; save(); refresh(); return toast(k === "None" ? "No thoughts added." : `Saved. A passage from ${k} appears once it is checked against the original.`); }
   if (k === "Not listed? Ask Raise to add someone") return toast("Request noted. A name is added only after its passages are checked.");
@@ -1411,9 +1797,32 @@ function handle(t){
   toast("This needs the hosted app.");
 }
 
+/* ---------------- voice typing: the microphone next to a text box, in the lesson language ---------------- */
+let rec = null;
+function dictate(m){
+  const field = m.parentElement.querySelector("input, textarea"); if (!field) return;
+  if (rec) { rec.stop(); return; }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return toast("Voice typing is not available in this browser. Tap the microphone key on your phone's keyboard instead.");
+  const base = field.value ? field.value.trim() + " " : "";
+  rec = new SR(); rec.lang = LANG_CODE[S.lang || "en"]; rec.interimResults = true; rec.continuous = false;
+  m.style.background = "#FDEBDD"; m.style.borderRadius = "22px"; toast(`Listening in ${LANG_NAME[S.lang || "en"]}… speak now. Tap the microphone again to stop.`);
+  rec.onresult = ev => { field.value = base + [...ev.results].map(r => r[0].transcript).join(""); field.dispatchEvent(new Event("input", { bubbles: true })); };
+  rec.onerror = ev => toast(ev.error === "not-allowed" || ev.error === "service-not-allowed" ? "Allow the microphone for this site in your browser settings, then try again." : ev.error === "no-speech" ? "Didn't hear anything. Tap the microphone and speak." : "Could not hear that. Please try again or type.");
+  rec.onend = () => { rec = null; m.style.background = ""; const v = field.value.trim();
+    if (v && cur === "Doubt" && field.closest("#s-Doubt")) { answer(v); field.value = ""; } };
+  try { rec.start(); } catch (er) { rec = null; m.style.background = ""; toast("Could not start the microphone. Please type instead."); }
+}
+
+const buzz = () => { try { if (navigator.vibrate) navigator.vibrate(12); } catch (er) {} };
 document.addEventListener("click", e => {
+  if (e.target.closest("[data-act=tpsave], [data-act=tptalked], [data-act=wasend], [data-act=celopen]")) buzz();
+  const mic = e.target.closest("#phone [data-mic]"); if (mic) { e.preventDefault(); return dictate(mic); }
+  const lm = e.target.closest("#phone [data-act=langmenu]"); if (lm) { e.preventDefault(); return $("#langmenu") ? closeLangMenu() : openLangMenu(lm); }
+  const li = e.target.closest("#langmenu [data-lang]"); if (li) { e.preventDefault(); closeLangMenu(); return handle(li); }
+  if ($("#langmenu") && !e.target.closest("#langmenu")) { closeLangMenu(); e.preventDefault(); return; }
   const j = e.target.closest("[data-jump]"); if (j) { stop(); hist.length = 0; return show(j.dataset.jump); }
-  const t = e.target.closest("#phone button, #phone a, #phone [data-overlay]"); if (!t) return;
+  const t = e.target.closest("#phone .screen button, #phone .screen a, #phone [data-overlay], #phone [data-topic], #phone [data-spark], #phone [data-fl], #celebrate button"); if (!t) return;
   if (t.tagName === "A" && t.getAttribute("target") === "_blank") return;
   e.preventDefault(); handle(t);
 });
@@ -1425,6 +1834,7 @@ document.addEventListener("keydown", e => {
   if (cur === "Phone") { const b = $$("#s-Phone button").find(x => label(x) === "Send code"); if (!b.disabled) show("Otp"); }
 });
 document.addEventListener("input", e => {
+  if (e.target.closest && e.target.closest("[data-b=ownmsg]")) { P().sparkOwn = e.target.textContent; save(); return; }
   if (cur === "Search" && e.target.matches("#s-Search input")) { if (BOUNDARY.test(e.target.value)) { $("#s-SearchBoundary input").value = e.target.value; return show("SearchBoundary"); } return refresh(); }
   if (cur === "Phone" && e.target.type === "tel") { const ok = e.target.value.replace(/\D/g, "").length === 10; const b = $$("#s-Phone button").find(x => label(x) === "Send code"); b.disabled = !ok; b.style.background = ok ? "#4A2C5A" : "#D8CFDD"; const err = startsText(scr("Phone"), "One digit is missing"); if (err) err.style.visibility = ok ? "hidden" : "visible"; }
   if (cur === "Delete" && e.target.matches("#s-Delete input")) { const b = $$("#s-Delete button").find(x => label(x) === "Delete everything"); const ok = e.target.value.trim().toUpperCase() === "DELETE"; b.disabled = !ok; b.style.opacity = ok ? "1" : ""; }
@@ -1435,7 +1845,124 @@ document.addEventListener("focusin", e => { if (e.target.matches("#s-Home input,
 addEventListener("offline", () => { if (cur === "Home") show("Offline"); });
 addEventListener("online", () => { if (cur === "Offline") show("Home"); });
 
+/* ---------------- one-time upgrades to the v7 screens (tester feedback, 15 Nov) ---------------- */
+function upgrade(){
+  // 1. microphones beside text boxes become real buttons
+  ["Doubt", "Boundary", "Debrief", "AddNote"].forEach(id => $$("input, textarea", scr(id)).forEach(f => { const m = f.nextElementSibling;
+    if (m && m.tagName === "SPAN" && m.querySelector("svg")) { m.dataset.mic = "1"; m.setAttribute("role", "button"); m.setAttribute("aria-label", "Speak instead of typing"); m.setAttribute("tabindex", "0"); m.style.cursor = "pointer"; } }));
+  // 2. Save for later shows its state
+  $$("button", scr("Preview")).filter(b => label(b) === "Save for later").forEach(b => b.dataset.act = "savelater");
+  // 3. one small language button (opens a short list): Home next to Help, the lesson top bar, and the first screen
+  ["Home", "Offline", "Gate", "Preview"].forEach(id => { const sc = scr(id); if (!sc) return; const help = $$("button", sc).find(b => label(b) === "Help"); if (!help || help.parentElement.dataset.langwrap) return;
+    const wrap = document.createElement("div"); wrap.dataset.langwrap = "1"; wrap.setAttribute("style", "display:flex;align-items:center;gap:2px"); help.before(wrap); wrap.append(langBtn("col"), help); });
+  ["Player", "Read", "Parts", "Doubt", "Boundary", "Ready", "Spark", "PickDay", "PlanSaved"].forEach(id => { const sc = scr(id), mn = sc && $("[aria-label=Minimise]", sc); if (!mn) return;
+    const spacer = [...mn.parentElement.children].find(k => k.tagName === "DIV" && /width:\s*36px/.test(k.getAttribute("style") || "") && !k.children.length); const b = langBtn("pill"); if (spacer) spacer.replaceWith(b); else mn.parentElement.append(b); });
+  const mainLang = scr("Main") && $$("button", scr("Main")).find(b => label(b) === "English"); if (mainLang) { mainLang.dataset.act = "langmenu"; mainLang.dataset.langlabel = "full"; }
+  const gfLang = scr("GoogleFail") && $$("button", scr("GoogleFail")).find(b => label(b) === "English"); if (gfLang) { gfLang.dataset.act = "langmenu"; gfLang.dataset.langlabel = "full"; }
+  // 4. "Was this useful?" and "Did you feel pushed?" become 1 to 5 scales that can be cleared
+  [["Reflection", ["useful", "pushed"]], ["Closing", ["useful"]]].forEach(([id, keys]) => { const sc = scr(id); if (!sc) return; let i = 0;
+    $$("button", sc).filter(b => label(b) === "Yes" && b.nextElementSibling && label(b.nextElementSibling) === "No").forEach(y => { const key = keys[i++]; if (!key) return; const box = y.parentElement;
+      box.setAttribute("style", (box.getAttribute("style") || "") + ";display:flex;gap:6px;flex-wrap:nowrap");
+      box.innerHTML = [1, 2, 3, 4, 5].map(v => `<button data-rate="${key}" data-n="${v}" aria-label="${v} of 5" style="${RT_OFF}">${v}</button>`).join("");
+      const row = box.parentElement; const cap = document.createElement("div"); cap.setAttribute("style", "font-size:12.5px;color:#6B6375;margin:-2px 0 8px;text-align:right");
+      cap.textContent = "1 = not at all · 5 = very much · tap again to clear"; row.after(cap); }); });
+  // 5. the bottom menu stays on every main screen
+  const NO_NAV = ["Main", "GoogleFail", "Phone", "Otp", "Q1", "Q2", "Q3", "Player", "Read", "Parts", "Doubt", "Boundary", "Ready", "Spark", "PickDay", "PlanSaved", "Admin"];
+  const TAB = { TalkCard: "MyTopics", Debrief: "MyTopics", Reflection: "MyTopics", TopicDetail: "MyTopics", NotYet: "MyTopics", TopicsEmpty: "MyTopics",
+    FamilyNote: "Me", AddNote: "Me", Stores: "Me", Checked: "Me", Account: "Me", Plan: "Me", Delete: "Me", Help: "Me" };
+  const navOf = id => { const s = scr(id); return s && $("nav", s); };
+  $$(".screen").forEach(sc => { const id = sc.id.slice(2); if (NO_NAV.includes(id) || $("nav", sc)) return; const src = navOf(TAB[id] || "Home") || navOf("Home"); if (!src) return;
+    // goes under any sheet or dim layer on the screen, so sheets still cover it
+    const root = sc.firstElementChild, firstPinned = [...root.children].find(k => /position:\s*(absolute|fixed)/.test(k.getAttribute("style") || ""));
+    root.insertBefore(src.cloneNode(true), firstPinned || null); sc.dataset.navAdded = "1"; });
+  // reflection: one scale caption, and a heading so it is clear the ratings are about this reflection
+  const rfl = scr("Reflection"), rt0 = rfl && $("[data-rate]", rfl); if (rt0) { const caps = $$("div", rfl).filter(d => /^1 = not at all/.test(d.textContent)); caps.slice(0, -1).forEach(c => c.remove());
+    let blk = rt0; while (blk.parentElement && !blk.parentElement.contains($$("div", rfl).find(e => !e.children.length && e.textContent.trim() === "Next for you"))) blk = blk.parentElement;
+    const h = document.createElement("div"); h.className = "sec-h"; h.textContent = "About this reflection"; blk.before(h); }
+  // 7. first lines: three to swipe between
+  ["Ready", "Spark"].forEach(id => { const sc = scr(id), f = sc && $("[data-b=firstline]", sc); if (!f) return; const box = f.parentElement; box.style.display = "none";
+    const row = document.createElement("div"); row.className = "fl-row"; row.dataset.b = "flrow"; box.after(row);
+    const tools = document.createElement("div"); tools.setAttribute("style", "flex-shrink:0;display:flex;justify-content:space-between;align-items:center;font-size:13px;color:#6B6375;margin:-6px 2px 2px");
+    tools.innerHTML = `<span data-b="flhint">Swipe to see all 3 lines</span><button data-act="editline" style="border:none;background:none;font:700 14px var(--font);color:#4A2C5A;cursor:pointer;height:36px;display:flex;align-items:center;gap:5px">${ic("pen", 15)}Use my own words</button>`; row.after(tools);
+    $$("button", sc).filter(b => label(b) === "See 2 other lines").forEach(b => b.style.display = "none"); });
+  // 8. the WhatsApp warm-up is its own green card
+  ["Ready", "Spark"].forEach(id => { const sc = scr(id), sw = sc && $$("button[role=switch]", sc).find(b => label(b).startsWith("Send a curiosity question")); if (!sw) return;
+    sw.classList.add("wa-row"); sw.firstElementChild.innerHTML = WA_ICON; const sp = sw.children[1].children; sp[0].textContent = "Warm up on WhatsApp first"; sp[1].textContent = "Send your teen a light question before you talk"; });
+  const spk = scr("Spark"), spx = spk && $("[data-b=sparks]", spk); if (spx) { const card = document.createElement("div"); card.className = "wa-card"; spx.before(card);
+    card.innerHTML = `<div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:#14743A;margin:0 2px 6px">${WA_ICON}Pick a question, or write your own</div>`; card.append(spx);
+    const send = document.createElement("button"); send.className = "wa-btn"; send.dataset.act = "wasend"; send.innerHTML = `${WA_ICON.replace(/#1FA855/g, "#FFFFFF")}Send on WhatsApp`; card.append(send);
+    const sv = $$("button", spk).find(b => label(b) === "Save and choose where to send"); if (sv) sv.textContent = "Save my plan"; }
+  // 9. the talk card's line: a readable size, shown as a line to say
+  const tcl = scr("TalkCard") && $("[data-b=firstline]", scr("TalkCard")); if (tcl) { tcl.classList.add("say"); tcl.style.fontSize = "19px"; tcl.style.lineHeight = "1.38"; tcl.style.padding = "12px 16px"; tcl.style.marginBottom = "12px";
+    const sw2 = startsText(scr("TalkCard"), "Start with"); if (sw2 && !sw2.children.length) sw2.textContent = "💬 Start with"; }
+  // 10. lines to say in the lesson look like chat bubbles
+  ["Player", "Read", "Parts", "Doubt", "Boundary", "Ready", "Spark", "PickDay", "PlanSaved"].forEach(id => { const sc = scr(id); if (!sc) return; $$("[data-b=line]", sc).forEach(l => { const box = l.closest("div[style*='border-radius']"); if (box) box.classList.add("say"); const lab = l.previousElementSibling; if (lab && lab.textContent.trim() === "You could say") { lab.innerHTML = `${ic("say", 15)}You could say`; lab.classList.add("lab-ic"); } }); });
+  // 12. ONE talk plan, opened from everywhere: what to say, when, WhatsApp warm-up, tips, and the outcome
+  const tcS = scr("TalkCard"), tfl = tcS && $("[data-b=firstline]", tcS); if (tfl) { const col = tfl.parentElement; col.style.paddingTop = "20px";
+    const hd = document.createElement("div"); hd.setAttribute("style", "display:flex;align-items:center;justify-content:space-between;gap:8px");
+    hd.innerHTML = `<div style="min-width:0"><h1 style="margin:0;font-size:22px;font-weight:700">Your talk plan</h1><div data-b="tptopic" style="font-size:14px;color:#6B6375;margin-top:2px"></div></div><button aria-label="Close" data-act="tpclose" style="border:none;background:#F3EEE8;width:44px;height:44px;border-radius:22px;cursor:pointer;font-size:24px;line-height:1;color:#2A2233;flex:none">×</button>`;
+    col.prepend(hd); $("[data-b=when]", tcS).style.display = "none";
+    tfl.style.display = "none"; tfl.classList.remove("say"); const lab = tfl.previousElementSibling; if (lab) { lab.innerHTML = `${ic("say", 17)}What to say`; lab.classList.add("lab-ic"); lab.style.marginTop = "14px"; }
+    const row = document.createElement("div"); row.className = "fl-row"; row.dataset.b = "flrow"; tfl.after(row);
+    const tools = document.createElement("div"); tools.setAttribute("style", "flex-shrink:0;display:flex;justify-content:space-between;align-items:center;font-size:13px;color:#6B6375;margin:-6px 2px 0");
+    tools.innerHTML = `<span>Swipe to see all 3 lines</span><button data-act="editline" style="border:none;background:none;font:700 14px var(--font);color:#4A2C5A;cursor:pointer;height:36px;display:flex;align-items:center;gap:5px">${ic("pen", 15)}Use my own words</button>`; row.after(tools);
+    const when = document.createElement("div"); when.setAttribute("style", "flex-shrink:0");
+    when.innerHTML = `<div class="lab-ic" style="font-size:14px;font-weight:700;color:#4A2C5A;margin-top:8px">${ic("cal", 17)}When</div><div data-b="tpdays" class="fl-row" style="gap:8px;padding:6px 2px 4px"></div><div data-b="tpplaces" class="fl-row" style="gap:8px;padding:2px 2px 4px"></div><div data-b="tpremind" style="font-size:13.5px;color:#6B6375;margin:0 2px"></div>`;
+    tools.after(when);
+    const wa = document.createElement("div"); wa.setAttribute("style", "flex-shrink:0;margin-top:12px");
+    wa.innerHTML = `<button data-act="watoggle" aria-label="Warm up on WhatsApp first" class="glass wa-toggle" style="font-family:inherit;cursor:pointer;width:100%;display:flex;align-items:center;gap:10px;text-align:left;border-radius:16px;padding:10px 12px;color:#2A2233">${WA_ICON}<span style="flex:1"><span style="display:block;font-size:15.5px;font-weight:700">Warm up on WhatsApp first</span><span style="display:block;font-size:13px;color:#3D6B4E">Send your teen a light question before you talk</span></span><span data-b="wachev" style="color:#1E7A4A;display:flex">${ic("chev", 20)}</span></button>
+      <div data-b="wabox" class="wa-card" style="display:none"><div data-b="sparks"></div><button class="wa-btn" data-act="wasend">${WA_ICON.replace(/#1FA855/g, "#FFFFFF")}Send on WhatsApp</button></div>`;
+    when.after(wa);
+    const keep = startsText(tcS, "Keep in mind"), keepBox = keep && keep.parentElement, whyBox = $("[data-b=tcwhyhead]", tcS) && $("[data-b=tcwhyhead]", tcS).parentElement;
+    const det = document.createElement("details"); det.className = "glass"; det.setAttribute("style", "flex-shrink:0;margin-top:12px;border-radius:18px;padding:0 14px");
+    det.innerHTML = `<summary style="cursor:pointer;font-size:15px;font-weight:700;color:#4A2C5A;min-height:50px;display:flex;align-items:center;gap:8px">${ic("bulb", 18)}<span style="flex:1">Tips, and what to do if it goes wrong</span>${ic("chev", 20)}</summary>`;
+    wa.after(det); [keepBox, whyBox].forEach(b => { if (b) { b.style.marginTop = "0"; b.style.marginBottom = "12px"; det.append(b); } });
+    const talked = $$("button", tcS).find(b => label(b) === "We talked"); if (talked) { const sv = document.createElement("button"); sv.dataset.act = "tpsave"; sv.textContent = "Save my plan"; sv.setAttribute("style", talked.getAttribute("style")); talked.before(sv); talked.dataset.act = "tptalked"; }
+    const nt = $$("button", tcS).find(b => label(b) === "Not today"); if (nt) nt.dataset.act = "tpnot";
+    if (talked) talked.parentElement.style.marginTop = "16px"; }
+  // "Talk card" is now "Talk plan" everywhere
+  $$(".screen button, .screen a").forEach(b => { if (label(b) === "Open talk card") { const leaf = $$("*", b).filter(e => !e.children.length && e.textContent.trim() === "Open talk card").pop(); (leaf || b).textContent = "Open talk plan"; } });
+  // 13. lesson toolbar: three equal tiles (Chapters, Ask a doubt, Next), apart from "I am ready to talk"
+  ["Player", "Read"].forEach(id => { const sc = scr(id), chb = sc && $$("button", sc).find(b => label(b) === "Chapters"); if (!chb) return; const bar = chb.parentElement;
+    let nx = $$("button", bar).find(b => label(b) === "Next chapter"); if (!nx) { nx = document.createElement("button"); nx.setAttribute("style", chb.getAttribute("style")); bar.append(nx); }
+    const ask = $$("button", bar).find(b => label(b) === "Ask a doubt");
+    const pv = document.createElement("button"); pv.setAttribute("style", chb.getAttribute("style")); bar.prepend(pv);
+    [[pv, "prev", "Previous chapter", "Previous", "tb-prev"], [chb, "list", "Chapters", "Chapters", ""], [ask, "ask", "Ask a doubt", "Ask a doubt", "tb-ask"], [nx, "next", "Next chapter", "Next", "tb-next"]].forEach(([b, i, aria, txt, cls]) => { if (!b) return; b.setAttribute("aria-label", aria); b.innerHTML = `${ic(i, 22)}<span>${txt}</span>`; if (cls) b.classList.add(cls); bar.append(b); });
+    bar.classList.add("tb", "glass");
+    const rd = $$("button", sc).find(b => label(b) === "I am ready to talk"); if (rd) rd.classList.add("ready-gap");
+    $$("[data-b=chlabel]", sc).forEach(e => e.classList.add("ch-chip")); });
+  // 14. topic page: every action looks like a button
+  const tdS = scr("TopicDetail"); if (tdS) { const B = k => $$("button", tdS).find(b => label(b) === k);
+    [["Listen again", "play", "btn-o"], ["Change plan", "pen", "btn-o"], ["We talked", "check", "btn-f"], ["Open talk plan", "plan", "btn-f"], ["Remove from My topics", "trash", "btn-o btn-danger btn-center"]].forEach(([k, i, c]) => { const b = B(k); if (!b) return; b.setAttribute("aria-label", k); b.innerHTML = `${ic(i, 17)}${k}`; c.split(" ").forEach(x => b.classList.add(x)); }); }
+  // 15. reflection: bigger section headings; "Next for you" marked so it is never shown twice
+  const rfS = scr("Reflection"); if (rfS) { const nxl = $$("div", rfS).find(e => !e.children.length && e.textContent.trim() === "Next for you");
+    if (nxl) { nxl.classList.add("sec-h"); nxl.dataset.b = "rfnextblk"; const card = $("[data-b=rfnext]", rfS); const ce = card && (card.closest("div[style*='border-radius']") || card.parentElement); if (ce) { const wrap = document.createElement("div"); wrap.dataset.b = "rfnextblk"; ce.before(wrap); wrap.append(ce); }
+      const op = $$("button", rfS).find(b => label(b) === "Open"); if (op && op.parentElement) op.parentElement.dataset.b = "rfnextblk"; } }
+  // 16. share with another parent: clearly a WhatsApp share
+  $$("button", scr("Closing")).filter(b => label(b) === "Share this topic with another parent").forEach(b => { b.setAttribute("aria-label", "Share this topic with another parent"); b.innerHTML = `${WA_ICON}<span>Share with a parent on WhatsApp</span>`; b.classList.add("btn-o", "wa-share"); });
+  // 17. first screen: the Raise wordmark and a glimpse of what Raise gives you (a first line, and a reply)
+  ["Main", "GoogleFail"].forEach(id => { const sc = scr(id); if (!sc) return; const hero = $$("div", sc).find(d => /height:\s*(330|280)px/.test(d.getAttribute("style") || "") && /#FDEBDD/.test(d.getAttribute("style") || ""));
+    if (hero) { const art = [...hero.children].find(k => k.tagName.toLowerCase() === "svg"); const h = document.createElement("div"); h.className = "hero";
+      h.innerHTML = `<div class="hb hb-p"><small>You</small>"I noticed you've been up late. Is everything okay?"</div><div class="hb hb-t"><small>Your teen</small>"Kind of… can we talk after dinner?"</div><div class="hero-cap">Raise gives you the first line. You have the talk.</div>`;
+      if (art) art.replaceWith(h); else hero.append(h); }
+    const nm = $$("div", sc).find(d => !d.children.length && d.textContent.trim() === "Raise"); if (nm) { nm.innerHTML = `<img src="logo.webp" alt="Raise" width="104" height="104" style="display:block;width:104px;height:104px;margin:-4px 0 -8px -10px" onerror="this.replaceWith(document.createTextNode('Raise'))">`; nm.setAttribute("aria-label", "Raise"); } });
+  // 19. honest wording: no placeholders, and say what the language switch really changes
+  $$(".screen *").filter(e => !e.children.length).forEach(e => { const t = e.textContent;
+    if (t.includes("[PRICE TO BE DECIDED]")) e.textContent = t.replace(/\s*\[PRICE TO BE DECIDED\]/, " Price not decided yet; Raise stays free for every parent.");
+    if (t.startsWith("Screens and lessons change together.")) e.textContent = "Lessons, doubts and reflections change to your language. Buttons stay in English for now. A lesson not yet checked in your language stays in English, with a note."; });
+  // 18. back, minimise and close: one clear round button
+  $$(".screen button[aria-label=Back], .screen button[aria-label=Minimise]").forEach(b => { b.classList.add("nav-btn"); b.innerHTML = ic(b.getAttribute("aria-label") === "Back" ? "back" : "chev", 22); });
+  $$("[data-act=tpclose]").forEach(b => { b.classList.add("nav-btn"); b.innerHTML = ic("x", 20); });
+  $$(".screen button[aria-label=Close]").forEach(b => { if (b.closest("#celebrate")) return; b.classList.add("nav-btn"); b.innerHTML = ic("x", 20); });
+  // 11. after "We talked", there is no "we have not talked yet"
+  const dbq = scr("Debrief") && $$("button", scr("Debrief")).find(b => label(b) === "We have not talked yet"); if (dbq) dbq.style.display = "none";
+  // 6. say what discreet mode is for
+  const ds = scr("Discreet"), dl = ds && startsText(ds, "For a shared phone"); if (dl) dl.textContent = "For shared phones. When it is on, Raise shows only general categories like \"Feelings\" instead of lesson titles and pictures, and reminders use your own neutral words like \"Evening walk\". Anyone glancing at your phone, including your teen, will not see what you are preparing for.";
+}
+
 capture();
+upgrade();
+makeScrollable();
 ["Search", "SearchBoundary", "Doubt", "Boundary"].forEach(id => $$("input", scr(id)).forEach(i => { i.value = ""; i.setAttribute("value", ""); }));
 const how = startsText(scr("FamilyNote"), "Suggests gentler openings"); if (how) how.textContent = "Raise uses your notes to suggest gentler first lines. In this preview they stay on this phone only. Raise never labels your child.";
 const how2 = startsText(scr("AddNote"), "Suggests gentler openings"); if (how2) how2.textContent = how.textContent;
@@ -1494,6 +2021,8 @@ window.RAISE_BAKED = {"topics": [{"slug": "phone-late-night", "title": "When you
     out.lesson = { chapters: chs, first_lines: arr(pick(l.first_lines, R.first_lines)), say: pick(tc.ask, tc.open, ""), talk_card: tc, sparks: arr(pick(l.sparks, R.sparks)),
       second_try: pick(l.second_try, R.second_try), sources: srcs.length ? srcs : (old.lesson && old.lesson.sources) || [],
       audio: audio.length ? audio : (old.lesson && old.lesson.audio) || [] };
+    const tr = item.translations || {}; out.lesson.tr = {};
+    Object.keys(tr).forEach(lg => { const x = tr[lg] || {}; if (arr(x.chapters).length === chs.length) out.lesson.tr[lg] = { title: x.title, chapters: arr(x.chapters).map(c => ({ title: c.title, text: strip(c.text) })), first_lines: arr(x.first_lines), talk_card: x.talk_card || {}, second_try: x.second_try || null, sparks: arr(x.sparks) }; });
     out.duration_min = pick(R.duration_min, Math.max(8, Math.round(words / 150)));
     out.summary = pick(R.summary, t.summary, old.summary, ""); out.why_now = pick(R.why_now, t.why_now, old.why_now, "");
     out.short = pick(t.short, R.short, old.short, String(t.title || "").replace(/^When your teen (is |feels |shows signs of |faces )?/i, "").replace(/^./, c => c.toUpperCase()));
@@ -1570,10 +2099,20 @@ window.RAISE_BAKED = {"topics": [{"slug": "phone-late-night", "title": "When you
       if (k === "Listen" || k === "Play" || k === "Pause") track("tap", { screen: sc, label: k });
       return false;
     },
+    // "Ask Raise to add this topic": stored for the topic finder
+    async request(q, lang) {
+      if (!sb) return false;
+      if (!session) await signInAnon();
+      if (!session) return false;
+      track("topic_request", { q: q.slice(0, 200) });
+      try { const r = await withTimeout(sb.from("topic_requests").insert({ query: q.slice(0, 300), lang, user_id: session.user.id }), 8000); return !r.error; } catch (e) { return false; }
+    },
+    // ratings (reflection useful / pushed, lesson useful) and shares, as usage events
+    rate(key, value, topic) { track("rating", { topic, key, value }); },
     async ask(q, t) {
       if (!sb) return null;
       track("doubt", { topic: t.slug, q: q.slice(0, 300) });
-      const r = await withTimeout(sb.functions.invoke("ask-doubt", { body: { q, slug: t.slug } }), 20000);
+      const r = await withTimeout(sb.functions.invoke("ask-doubt", { body: { q, slug: t.slug, lang: (RAISE.S.lang || "en") } }), 20000);
       if (r.error) return null;
       return r.data;
     },

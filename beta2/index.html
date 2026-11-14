@@ -129,6 +129,10 @@ body.t2 .st-done{color:#2F7D57!important} body.t2 .st-plan{color:#C2453D!importa
 .lockup{display:inline-flex;align-items:center;gap:10px}
 .lockup-sym svg{width:100%;height:100%;display:block}
 .lockup-word{font-family:var(--font);font-weight:800;letter-spacing:.14em;color:#4A2C5A;line-height:1}
+/* every button presses in a little */
+.screen button{transition:transform .12s ease}
+.screen button:active{transform:scale(.97)}
+@media (prefers-reduced-motion:reduce){.screen button{transition:none}.screen button:active{transform:none}}
 /* wordmark */
 .wm{font-family:var(--font);font-weight:800;color:#4A2C5A;letter-spacing:-.03em;line-height:1;display:inline-block}
 .wm-i{position:relative;display:inline-block;width:.26em;height:.53em;margin:0 .035em;vertical-align:baseline}
@@ -1810,7 +1814,9 @@ function dictate(m){
   try { rec.start(); } catch (er) { rec = null; m.style.background = ""; toast("Could not start the microphone. Please type instead."); }
 }
 
+const buzz = () => { try { if (navigator.vibrate) navigator.vibrate(12); } catch (er) {} };
 document.addEventListener("click", e => {
+  if (e.target.closest("[data-act=tpsave], [data-act=tptalked], [data-act=wasend], [data-act=celopen]")) buzz();
   const mic = e.target.closest("#phone [data-mic]"); if (mic) { e.preventDefault(); return dictate(mic); }
   const lm = e.target.closest("#phone [data-act=langmenu]"); if (lm) { e.preventDefault(); return $("#langmenu") ? closeLangMenu() : openLangMenu(lm); }
   const li = e.target.closest("#langmenu [data-lang]"); if (li) { e.preventDefault(); closeLangMenu(); return handle(li); }
@@ -1935,14 +1941,19 @@ function upgrade(){
   // 16. share with another parent: clearly a WhatsApp share
   $$("button", scr("Closing")).filter(b => label(b) === "Share this topic with another parent").forEach(b => { b.setAttribute("aria-label", "Share this topic with another parent"); b.innerHTML = `${WA_ICON}<span>Share with a parent on WhatsApp</span>`; b.classList.add("btn-o", "wa-share"); });
   // 17. first screen: the Raise wordmark and a glimpse of what Raise gives you (a first line, and a reply)
-  ["Main", "GoogleFail"].forEach(id => { const sc = scr(id); if (!sc) return; const hero = $$("div", sc).find(d => /height:\s*330px/.test(d.getAttribute("style") || ""));
+  ["Main", "GoogleFail"].forEach(id => { const sc = scr(id); if (!sc) return; const hero = $$("div", sc).find(d => /height:\s*(330|280)px/.test(d.getAttribute("style") || "") && /#FDEBDD/.test(d.getAttribute("style") || ""));
     if (hero) { const art = [...hero.children].find(k => k.tagName.toLowerCase() === "svg"); const h = document.createElement("div"); h.className = "hero";
       h.innerHTML = `<div class="hb hb-p"><small>You</small>"I noticed you've been up late. Is everything okay?"</div><div class="hb hb-t"><small>Your teen</small>"Kind of… can we talk after dinner?"</div><div class="hero-cap">Raise gives you the first line. You have the talk.</div>`;
       if (art) art.replaceWith(h); else hero.append(h); }
     const nm = $$("div", sc).find(d => !d.children.length && d.textContent.trim() === "Raise"); if (nm) { nm.innerHTML = `<img src="logo.webp" alt="Raise" width="104" height="104" style="display:block;width:104px;height:104px;margin:-4px 0 -8px -10px" onerror="this.replaceWith(document.createTextNode('Raise'))">`; nm.setAttribute("aria-label", "Raise"); } });
+  // 19. honest wording: no placeholders, and say what the language switch really changes
+  $$(".screen *").filter(e => !e.children.length).forEach(e => { const t = e.textContent;
+    if (t.includes("[PRICE TO BE DECIDED]")) e.textContent = t.replace(/\s*\[PRICE TO BE DECIDED\]/, " Price not decided yet; Raise stays free for every parent.");
+    if (t.startsWith("Screens and lessons change together.")) e.textContent = "Lessons, doubts and reflections change to your language. Buttons stay in English for now. A lesson not yet checked in your language stays in English, with a note."; });
   // 18. back, minimise and close: one clear round button
   $$(".screen button[aria-label=Back], .screen button[aria-label=Minimise]").forEach(b => { b.classList.add("nav-btn"); b.innerHTML = ic(b.getAttribute("aria-label") === "Back" ? "back" : "chev", 22); });
   $$("[data-act=tpclose]").forEach(b => { b.classList.add("nav-btn"); b.innerHTML = ic("x", 20); });
+  $$(".screen button[aria-label=Close]").forEach(b => { if (b.closest("#celebrate")) return; b.classList.add("nav-btn"); b.innerHTML = ic("x", 20); });
   // 11. after "We talked", there is no "we have not talked yet"
   const dbq = scr("Debrief") && $$("button", scr("Debrief")).find(b => label(b) === "We have not talked yet"); if (dbq) dbq.style.display = "none";
   // 6. say what discreet mode is for
