@@ -38,17 +38,52 @@ body{background:var(--stage);font-family:var(--font);color:var(--ink);display:fl
 /* first lines: swipe between three */
 .fl-row{flex-shrink:0;display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 2px 12px;scrollbar-width:none}
 .fl-row::-webkit-scrollbar{display:none}
-.fl-card{flex:0 0 82%;scroll-snap-align:start;box-sizing:border-box;border-radius:22px 22px 22px 6px;padding:12px 14px;font-size:16px;line-height:1.4;background:#FFFFFF;box-shadow:inset 0 0 0 1px #E8DFD3;cursor:pointer;color:#2A2233;outline:none}
+.fl-card{backdrop-filter:blur(10px);flex:0 0 82%;scroll-snap-align:start;box-sizing:border-box;border-radius:22px 22px 22px 6px;padding:12px 14px;font-size:16px;line-height:1.4;background:#FFFFFF;box-shadow:inset 0 0 0 1px #E8DFD3;cursor:pointer;color:#2A2233;outline:none}
 .fl-card.on{background:#F4ECFA;box-shadow:inset 0 0 0 2px #4A2C5A}
 .fl-card small{display:block;font-size:12px;font-weight:700;color:#6B6375;margin-bottom:4px}
 /* WhatsApp warm-up: its own green card */
-.wa-card{flex-shrink:0;margin-top:10px;background:#E8F8EE;border-radius:20px;padding:12px 12px 14px;box-shadow:inset 0 0 0 1px #BFE8CD}
+.wa-card{flex-shrink:0;margin-top:10px;background:linear-gradient(160deg,rgba(236,250,242,.75),rgba(255,255,255,.6));-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.85);border-radius:20px;padding:12px 12px 14px;box-shadow:0 8px 24px rgba(31,122,77,.08)}
 .wa-card .fl-card{background:#FFFFFF;box-shadow:inset 0 0 0 1px #CFEBD9}
-.wa-card .fl-card.on{background:#DCF8C6;box-shadow:inset 0 0 0 2px #1FA855}
-.wa-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:48px;border:none;border-radius:24px;background:#1FA855;color:#fff;font:700 16px var(--font);cursor:pointer;margin-top:4px}
-.wa-row{background:#E8F8EE!important;border-radius:16px;padding:6px 10px!important;margin-top:6px}
+.wa-card .fl-card.on{background:#E3F6EA;box-shadow:inset 0 0 0 2px #2FA36B}
+.wa-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:48px;border:none;border-radius:24px;background:linear-gradient(135deg,#34C27A,#1E9A5A);color:#fff;font:700 16px var(--font);cursor:pointer;margin-top:4px;box-shadow:0 6px 16px rgba(30,154,90,.25)}
+.wa-row{background:rgba(236,250,242,.7)!important;border:1px solid rgba(255,255,255,.85)!important;border-radius:16px;padding:6px 10px!important;margin-top:6px}
+/* ---- design pass 15 Nov: glass surfaces, one button language, clear status colours ---- */
+.glass{background:rgba(255,255,255,.62)!important;-webkit-backdrop-filter:blur(16px) saturate(140%);backdrop-filter:blur(16px) saturate(140%);border:1px solid rgba(255,255,255,.8);box-shadow:0 8px 24px rgba(74,44,90,.08)!important}
+.ic{flex:none;display:inline-block;vertical-align:-3px}
+/* lesson toolbar: three equal tiles, icon above a one-word label */
+.tb{display:grid!important;grid-template-columns:repeat(3,1fr);gap:8px;padding:8px;border-radius:22px;margin-top:14px!important}
+.tb button{height:60px!important;width:100%;flex-direction:column!important;justify-content:center!important;align-items:center!important;gap:3px!important;border-radius:16px!important;font-size:13px!important;font-weight:700!important;padding:0 4px!important;background:rgba(255,255,255,.75)!important;color:#4A2C5A!important;margin:0!important;white-space:nowrap}
+.tb .tb-ask{background:#EFE6FA!important;color:#5B3A8C!important}
+.tb .tb-next{background:#FDE7D6!important;color:#9A4A16!important}
+.ready-gap{margin-top:16px!important}
+.ch-chip{display:inline-flex!important;align-self:flex-start;width:auto!important;background:#EFE6FA;color:#5B3A8C!important;border-radius:12px;padding:3px 10px;font-size:12.5px!important;font-weight:700!important}
+.ch-end{display:flex;align-items:center;gap:10px;margin:18px 0 6px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#9A8FA6}
+.ch-end::before,.ch-end::after{content:"";flex:1;height:1px;background:#E6DCEB}
+/* buttons: filled = main action, outline = secondary, red outline = remove */
+.btn-f,.btn-o{display:inline-flex!important;align-items:center;justify-content:center;gap:6px;height:42px!important;padding:0 16px!important;border-radius:21px!important;font:700 15px var(--font)!important;cursor:pointer;white-space:nowrap}
+.btn-f{background:#4A2C5A!important;color:#FFFFFF!important;border:none!important;box-shadow:0 4px 12px rgba(74,44,90,.22)}
+.btn-o{background:rgba(255,255,255,.7)!important;color:#4A2C5A!important;border:1.5px solid #4A2C5A!important}
+.btn-danger{color:#B83A3A!important;border-color:#E3A3A3!important}
+.btn-center{align-self:center;margin:14px auto 0!important}
+/* section headings */
+.sec-h{font-size:17px!important;font-weight:700!important;color:#2A2233!important;margin:22px 0 6px!important;display:flex;align-items:center;gap:8px}
+.lab-ic{display:flex!important;align-items:center;gap:6px}
+/* chevrons turn when a section opens */
+.chev{transition:transform .2s ease}
+details[open] .chev,[aria-expanded=true] .chev{transform:rotate(180deg)}
+details summary{list-style:none}
+details summary::-webkit-details-marker{display:none}
+/* My topics status colours */
+.st{display:flex!important;align-items:center;gap:5px;font-weight:600}
+.st-done{color:#1F7A4D!important}
+.st-plan{color:#C23B3B!important}
+.st-go{color:#B45309!important}
+.st-next{color:#5B3A8C!important}
+.st-saved{color:#6B6375!important}
+/* reflection: while the celebration is open, the page does not repeat "Next for you" */
+.celebrating [data-b=rfnextblk]{display:none!important}
 /* reflection: a small celebration with the next topic */
-#celebrate{position:absolute;left:12px;right:12px;bottom:88px;z-index:40;background:#FFFFFF;border-radius:24px;box-shadow:0 14px 40px rgba(42,34,51,.28);padding:16px;animation:rise .35s ease-out}
+#celebrate{position:absolute;left:12px;right:12px;bottom:88px;z-index:40;background:rgba(255,255,255,.88);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.9);border-radius:24px;box-shadow:0 14px 40px rgba(42,34,51,.28);padding:16px;animation:rise .35s ease-out}
 @keyframes rise{0%{transform:translateY(30px);opacity:0}100%{transform:none;opacity:1}}
 @media (max-width:760px){ #index{display:none} body{gap:0} }
 @media (prefers-reduced-motion:reduce){ #toast{transition:none} .say.pop,#celebrate{animation:none} }

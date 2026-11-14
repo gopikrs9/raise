@@ -41,17 +41,52 @@ body{background:var(--stage);font-family:var(--font);color:var(--ink);display:fl
 /* first lines: swipe between three */
 .fl-row{flex-shrink:0;display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 2px 12px;scrollbar-width:none}
 .fl-row::-webkit-scrollbar{display:none}
-.fl-card{flex:0 0 82%;scroll-snap-align:start;box-sizing:border-box;border-radius:22px 22px 22px 6px;padding:12px 14px;font-size:16px;line-height:1.4;background:#FFFFFF;box-shadow:inset 0 0 0 1px #E8DFD3;cursor:pointer;color:#2A2233;outline:none}
+.fl-card{backdrop-filter:blur(10px);flex:0 0 82%;scroll-snap-align:start;box-sizing:border-box;border-radius:22px 22px 22px 6px;padding:12px 14px;font-size:16px;line-height:1.4;background:#FFFFFF;box-shadow:inset 0 0 0 1px #E8DFD3;cursor:pointer;color:#2A2233;outline:none}
 .fl-card.on{background:#F4ECFA;box-shadow:inset 0 0 0 2px #4A2C5A}
 .fl-card small{display:block;font-size:12px;font-weight:700;color:#6B6375;margin-bottom:4px}
 /* WhatsApp warm-up: its own green card */
-.wa-card{flex-shrink:0;margin-top:10px;background:#E8F8EE;border-radius:20px;padding:12px 12px 14px;box-shadow:inset 0 0 0 1px #BFE8CD}
+.wa-card{flex-shrink:0;margin-top:10px;background:linear-gradient(160deg,rgba(236,250,242,.75),rgba(255,255,255,.6));-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.85);border-radius:20px;padding:12px 12px 14px;box-shadow:0 8px 24px rgba(31,122,77,.08)}
 .wa-card .fl-card{background:#FFFFFF;box-shadow:inset 0 0 0 1px #CFEBD9}
-.wa-card .fl-card.on{background:#DCF8C6;box-shadow:inset 0 0 0 2px #1FA855}
-.wa-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:48px;border:none;border-radius:24px;background:#1FA855;color:#fff;font:700 16px var(--font);cursor:pointer;margin-top:4px}
-.wa-row{background:#E8F8EE!important;border-radius:16px;padding:6px 10px!important;margin-top:6px}
+.wa-card .fl-card.on{background:#E3F6EA;box-shadow:inset 0 0 0 2px #2FA36B}
+.wa-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:48px;border:none;border-radius:24px;background:linear-gradient(135deg,#34C27A,#1E9A5A);color:#fff;font:700 16px var(--font);cursor:pointer;margin-top:4px;box-shadow:0 6px 16px rgba(30,154,90,.25)}
+.wa-row{background:rgba(236,250,242,.7)!important;border:1px solid rgba(255,255,255,.85)!important;border-radius:16px;padding:6px 10px!important;margin-top:6px}
+/* ---- design pass 15 Nov: glass surfaces, one button language, clear status colours ---- */
+.glass{background:rgba(255,255,255,.62)!important;-webkit-backdrop-filter:blur(16px) saturate(140%);backdrop-filter:blur(16px) saturate(140%);border:1px solid rgba(255,255,255,.8);box-shadow:0 8px 24px rgba(74,44,90,.08)!important}
+.ic{flex:none;display:inline-block;vertical-align:-3px}
+/* lesson toolbar: three equal tiles, icon above a one-word label */
+.tb{display:grid!important;grid-template-columns:repeat(3,1fr);gap:8px;padding:8px;border-radius:22px;margin-top:14px!important}
+.tb button{height:60px!important;width:100%;flex-direction:column!important;justify-content:center!important;align-items:center!important;gap:3px!important;border-radius:16px!important;font-size:13px!important;font-weight:700!important;padding:0 4px!important;background:rgba(255,255,255,.75)!important;color:#4A2C5A!important;margin:0!important;white-space:nowrap}
+.tb .tb-ask{background:#EFE6FA!important;color:#5B3A8C!important}
+.tb .tb-next{background:#FDE7D6!important;color:#9A4A16!important}
+.ready-gap{margin-top:16px!important}
+.ch-chip{display:inline-flex!important;align-self:flex-start;width:auto!important;background:#EFE6FA;color:#5B3A8C!important;border-radius:12px;padding:3px 10px;font-size:12.5px!important;font-weight:700!important}
+.ch-end{display:flex;align-items:center;gap:10px;margin:18px 0 6px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#9A8FA6}
+.ch-end::before,.ch-end::after{content:"";flex:1;height:1px;background:#E6DCEB}
+/* buttons: filled = main action, outline = secondary, red outline = remove */
+.btn-f,.btn-o{display:inline-flex!important;align-items:center;justify-content:center;gap:6px;height:42px!important;padding:0 16px!important;border-radius:21px!important;font:700 15px var(--font)!important;cursor:pointer;white-space:nowrap}
+.btn-f{background:#4A2C5A!important;color:#FFFFFF!important;border:none!important;box-shadow:0 4px 12px rgba(74,44,90,.22)}
+.btn-o{background:rgba(255,255,255,.7)!important;color:#4A2C5A!important;border:1.5px solid #4A2C5A!important}
+.btn-danger{color:#B83A3A!important;border-color:#E3A3A3!important}
+.btn-center{align-self:center;margin:14px auto 0!important}
+/* section headings */
+.sec-h{font-size:17px!important;font-weight:700!important;color:#2A2233!important;margin:22px 0 6px!important;display:flex;align-items:center;gap:8px}
+.lab-ic{display:flex!important;align-items:center;gap:6px}
+/* chevrons turn when a section opens */
+.chev{transition:transform .2s ease}
+details[open] .chev,[aria-expanded=true] .chev{transform:rotate(180deg)}
+details summary{list-style:none}
+details summary::-webkit-details-marker{display:none}
+/* My topics status colours */
+.st{display:flex!important;align-items:center;gap:5px;font-weight:600}
+.st-done{color:#1F7A4D!important}
+.st-plan{color:#C23B3B!important}
+.st-go{color:#B45309!important}
+.st-next{color:#5B3A8C!important}
+.st-saved{color:#6B6375!important}
+/* reflection: while the celebration is open, the page does not repeat "Next for you" */
+.celebrating [data-b=rfnextblk]{display:none!important}
 /* reflection: a small celebration with the next topic */
-#celebrate{position:absolute;left:12px;right:12px;bottom:88px;z-index:40;background:#FFFFFF;border-radius:24px;box-shadow:0 14px 40px rgba(42,34,51,.28);padding:16px;animation:rise .35s ease-out}
+#celebrate{position:absolute;left:12px;right:12px;bottom:88px;z-index:40;background:rgba(255,255,255,.88);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.9);border-radius:24px;box-shadow:0 14px 40px rgba(42,34,51,.28);padding:16px;animation:rise .35s ease-out}
 @keyframes rise{0%{transform:translateY(30px);opacity:0}100%{transform:none;opacity:1}}
 @media (max-width:760px){ #index{display:none} body{gap:0;background:#FFF8F0} #phone{border-radius:0;box-shadow:none} }
 @media (prefers-reduced-motion:reduce){ #toast{transition:none} .say.pop,#celebrate{animation:none} }
@@ -988,6 +1023,25 @@ function openLangMenu(from){
 const closeLangMenu = () => { const m = $("#langmenu"); if (m) m.remove(); };
 
 const WA_ICON = '<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24"><path fill="#1FA855" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.6a2.8 2.8 0 0 0 1.8-1.3 2.3 2.3 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3z"/></svg>';
+const ICP = {
+  list: '<path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r=".9" fill="currentColor"/><circle cx="3.5" cy="12" r=".9" fill="currentColor"/><circle cx="3.5" cy="18" r=".9" fill="currentColor"/>',
+  ask: '<circle cx="12" cy="12" r="9.5"/><path d="M9.2 9.2a2.9 2.9 0 0 1 5.6 1c0 1.9-2.8 2.6-2.8 2.6"/><circle cx="12" cy="16.9" r=".9" fill="currentColor"/>',
+  next: '<path d="M6 5l9 7-9 7z"/><path d="M18 5v14"/>',
+  say: '<path d="M20.5 14.5a2 2 0 0 1-2 2H8l-4.5 3.5V5.5a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2z"/><path d="M8 9h8M8 12.5h5"/>',
+  cal: '<rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M16 2.5v4M8 2.5v4M3.5 10h17"/>',
+  bulb: '<path d="M9 18h6M10 21.5h4"/><path d="M12 2.5a6.5 6.5 0 0 0-3.8 11.8c.6.5.8 1.2.8 1.9V16h6v-.2c0-.7.3-1.4.8-1.9A6.5 6.5 0 0 0 12 2.5z"/>',
+  bell: '<path d="M6 9a6 6 0 0 1 12 0c0 6.5 2.5 8 2.5 8h-17S6 15.5 6 9z"/><path d="M10.3 20.5a1.9 1.9 0 0 0 3.4 0"/>',
+  pen: '<path d="M16.5 3.5a2.4 2.4 0 0 1 3.4 3.4L8 18.8 3.5 20.5l1.7-4.5z"/>',
+  chev: '<path d="m6 9 6 6 6-6"/>',
+  redo: '<path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1L3.5 8.5"/><path d="M3.5 3.5v5h5"/>',
+  play: '<path d="M7 4.5l12 7.5-12 7.5z"/>',
+  check: '<circle cx="12" cy="12" r="9.5"/><path d="m8 12.3 2.7 2.7L16.2 9.5"/>',
+  trash: '<path d="M3.5 6.5h17M9 6.5V4h6v2.5M18.5 6.5l-1 13.5h-11l-1-13.5"/>',
+  plan: '<rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M16 2.5v4M8 2.5v4M3.5 10h17"/><path d="m9 15 2 2 4-4"/>',
+  clock: '<circle cx="12" cy="12" r="9.5"/><path d="M12 7v5l3 2"/>',
+  bookmark: '<path d="M7 3.5h10a1 1 0 0 1 1 1v16l-6-4-6 4v-16a1 1 0 0 1 1-1z"/>',
+  arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>' };
+const ic = (n, sz = 18, col = "currentColor") => `<svg class="ic${n === "chev" ? " chev" : ""}" aria-hidden="true" width="${sz}" height="${sz}" viewBox="0 0 24 24" fill="none" stroke="${col}" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">${ICP[n]}</svg>`;
 /* ratings 1 to 5, tap again to clear */
 const RT_ON = "border:none;font-family:inherit;cursor:pointer;width:34px;height:34px;border-radius:17px;font-size:15px;font-weight:700;background:#4A2C5A;color:#FFFFFF;flex:0 0 auto";
 const RT_OFF = "border:none;font-family:inherit;cursor:pointer;width:34px;height:34px;border-radius:17px;font-size:15px;font-weight:700;background:#F3EEE8;color:#4A2C5A;flex:0 0 auto";
@@ -1221,6 +1275,13 @@ function drawMyTopics(sc){
     const n = clone(tpl); n.dataset.topic = s; fillRow(n, t, sub); const b = n.querySelector("button"); if (b && tpl === TPL.myTalk) b.textContent = p.stage === "heard" ? "Plan talk" : "Talk plan"; list.append(n); });
   if (!mine.length) list.innerHTML = `<div style="padding:20px 4px;color:#6B6375;font-size:15px">Nothing here yet.</div>`;
   $$("button, a", sc).forEach(b => { $$("*", b).concat([b]).filter(e => !e.children.length && e.textContent.trim() === "Talk card").forEach(e => e.textContent = "Talk plan"); });
+  $$("[data-topic]", sc).forEach(row => { const q = S.t[row.dataset.topic]; if (!q) return; const tx = $$("div", row).filter(d => !d.children.length && d.textContent.trim()); const sub = tx[1]; if (!sub) return;
+    const [cls, icn, txt] = q.stage === "done" ? ["st-done", "check", `Done · talked ${dayLabel(q.talked || today).replace("Tonight", "today")}`]
+      : q.stage === "planned" ? ["st-plan", "cal", `Talk ${dayLabel(q.date).replace("Tonight", "today")} · ${q.place}`]
+      : q.stage === "listening" ? ["st-go", "clock", sub.textContent.replace(/^Next: /, "")]
+      : q.stage === "heard" ? ["st-next", "plan", "Heard · plan your talk"] : ["st-saved", "bookmark", sub.textContent];
+    sub.className = "st " + cls; sub.innerHTML = `${ic(icn, 15)}<span>${esc(txt)}</span>`;
+    $$("button", row).forEach(b => { if (!b.classList.contains("btn-o")) { b.classList.add("btn-o"); b.style.height = "36px"; b.style.padding = "0 12px"; b.style.fontSize = "14px"; } }); });
 }
 function fillRow(n, t, sub){ const sq = n.querySelector("div div") || n.querySelector("div"); const ic = $$("div", n).find(d => (d.getAttribute("style") || "").includes("width: 56px")); if (ic) paint(ic, t, ICON_TALK.replace('width="56" height="56"', 'width="30" height="30"'));
   const tx = $$("div", n).filter(d => !d.children.length && d.textContent.trim()); if (tx[0]) tx[0].textContent = S.discreet ? t.category : (t.short || t.title); if (tx[1]) tx[1].textContent = sub; }
@@ -1254,7 +1315,7 @@ const RT = {
   hi: { thanks: "कोशिश करने के लिए धन्यवाद।", asked: "उन्होंने पलटकर कुछ पूछा। यह अच्छा संकेत है: वे सुन रहे थे।", listened: "उन्होंने सुना। यह अच्छी शुरुआत है।", time: "आपने इसके लिए समय निकाला, और यही मायने रखता है।",
     hardFb: "कोशिश करने के लिए धन्यवाद। पहली बातचीत अक्सर ऐसी ही होती है, और यह असफलता नहीं है। आपने बात शुरू की, और यही सबसे मुश्किल हिस्सा है।",
     goodNext: "बातचीत का दरवाज़ा खुला रखें। उन्हें धन्यवाद कहें, और कुछ दिन इसे आज़माने पर सहमत हों।", closeSay: "प्यार से बात खत्म करने के लिए आप कह सकते हैं", later: "आज बाद में आप कह सकते हैं", then: "फिर", nextTry: "अगली बार आप ऐसे शुरू कर सकते हैं", calm: "एक-दो दिन में, जब आप दोनों शांत हों, फिर से बात करें।" } };
-const bubble = (lab, line) => `<div style="margin-top:10px"><div style="font-size:13px;font-weight:700;color:#6B6375;margin:0 0 4px 2px">💬 ${esc(lab)}</div><div class="say" style="padding:10px 14px;font-size:15.5px;line-height:1.4;color:#2A2233;margin-bottom:8px">"${esc(noCite(line))}"</div></div>`;
+const bubble = (lab, line) => `<div style="margin-top:10px"><div class="lab-ic" style="font-size:13px;font-weight:700;color:#5B3A8C;margin:0 0 4px 2px">${ic("say", 15)}${esc(lab)}</div><div class="say" style="padding:10px 14px;font-size:15.5px;line-height:1.4;color:#2A2233;margin-bottom:8px">"${esc(noCite(line))}"</div></div>`;
 function drawReflection(sc){
   if (!ready(T())) return;
   const t = T(), p = P(), d = p.debrief || {}, X = LX(t), st = X.second_try || null, tc = X.talk_card || {};
@@ -1280,8 +1341,8 @@ function drawReflection(sc){
     mine.innerHTML = `<div style="font-size:12.5px;font-weight:700;color:#6B6375;margin-bottom:4px">What you noted</div>${bits ? `<div>${esc(bits)}</div>` : ""}${d.said ? `<div style="margin-top:4px;font-style:italic">"${esc(d.said)}"</div>` : ""}`; }
   drawRatings(sc, p.debrief);
   let btn = $("[data-act=secondtry]", sc);
-  if (!btn && r2) { btn = document.createElement("button"); btn.dataset.act = "secondtry"; btn.setAttribute("style", "border: none; font-family: inherit; cursor: pointer; height: 44px; padding: 0 18px; border-radius: 22px; background: #FDEBDD; color: #4A2C5A; font-size: 15px; font-weight: 700; margin-top: 12px; align-self: flex-start"); (mine || r2).after(btn); }
-  if (btn) { btn.textContent = hard ? "Plan a second try" : "Plan the next talk"; btn.style.display = ready(t) ? "" : "none"; }
+  if (!btn && r2) { btn = document.createElement("button"); btn.dataset.act = "secondtry"; btn.className = "btn-f"; btn.setAttribute("style", "margin-top:14px;align-self:flex-start"); (mine || r2).after(btn); }
+  if (btn) { const bl = hard ? "Plan a second try" : "Plan the next talk"; btn.setAttribute("aria-label", bl); btn.innerHTML = `${ic(hard ? "redo" : "plan", 17)}${bl}`; btn.style.display = ready(t) ? "" : "none"; }
   // after rating (or 25 seconds), a small celebration offers the next topic
   clearTimeout(drawReflection.tm); const cel = $("#celebrate"); if (cel && cel.dataset.for !== S.cur) cel.remove();
   if (next && !p.celebrated) drawReflection.tm = setTimeout(() => celebrate(next), d.useful && d.pushed ? 900 : 25000);
@@ -1292,7 +1353,7 @@ function celebrate(next){
   c.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><div><div style="font-size:20px;font-weight:700;color:#2A2233">🎉 You had the talk. Well done.</div><div style="font-size:14.5px;color:#6B6375;margin-top:4px">Most parents never take this first step. Ready for the next one?</div></div><button data-act="celclose" aria-label="Close" style="border:none;background:#F3EEE8;width:36px;height:36px;border-radius:18px;font-size:18px;cursor:pointer;flex:none">×</button></div>
     <div data-topic="${esc(next.slug)}" style="margin-top:12px;display:flex;gap:12px;align-items:center;background:#FFF8F0;border-radius:16px;padding:10px;cursor:pointer"><div data-b="celsq" style="width:52px;height:52px;border-radius:12px;flex:none"></div><div><div style="font-size:12.5px;font-weight:700;color:#6B6375">Next for you</div><div style="font-size:15.5px;font-weight:700;color:#2A2233">${esc(next.title)}</div><div style="font-size:13px;color:#6B6375">${ready(next) ? `${next.duration_min} min · ready to listen` : "Lesson being written"}</div></div></div>
     <div style="display:flex;gap:10px;margin-top:12px"><button data-act="celopen" data-slug="${esc(next.slug)}" style="flex:1;height:46px;border:none;border-radius:23px;background:#4A2C5A;color:#fff;font:700 16px var(--font);cursor:pointer">Open</button><button data-act="celclose" style="flex:1;height:46px;border:none;border-radius:23px;background:#F3EEE8;color:#4A2C5A;font:700 16px var(--font);cursor:pointer">Later</button></div>`;
-  $("#phone").append(c); paint($("[data-b=celsq]", c), next, ICON_TALK.replace('width="56" height="56"', 'width="28" height="28"'));
+  $("#phone").append(c); scr("Reflection").classList.add("celebrating"); paint($("[data-b=celsq]", c), next, ICON_TALK.replace('width="56" height="56"', 'width="28" height="28"'));
 }
 function drawCommon(sc){
   $$("[data-b=greet]", sc).forEach(g => g.textContent = g.textContent.startsWith("Welcome") ? (firstName() ? `Welcome back, ${firstName()}` : "Welcome back") : greetName());
@@ -1316,7 +1377,7 @@ function drawPlayer(sc){
   $$("[data-b=line]", sc).forEach(e => e.textContent = `"${chLine(p.ch)}"`);
   $$("[data-b=playbtn]", sc).forEach(e => { e.innerHTML = playing ? TPL.pause : TPL.play; e.setAttribute("aria-label", playing ? "Pause" : "Play"); });
   const rb = $("[data-b=readbody]", sc);
-  if (rb) { rb.innerHTML = c.text.split(/\n+/).filter(Boolean).map(x => `<p style="${TPL.p}">${esc(x)}</p>`).join("") + TPL.box; $$("div", rb).forEach(d => { if (!d.children.length && d.textContent.trim().startsWith('"')) d.textContent = `"${chLine(p.ch)}"`; if (!d.children.length && d.textContent.trim() === "You could say") d.textContent = "💬 You could say"; }); const bx = rb.lastElementChild; if (bx) bx.classList.add("say"); rb.style.zoom = { "Standard": 1, "Large": 1.12, "Extra large": 1.25 }[S.textSize]; }
+  if (rb) { rb.innerHTML = c.text.split(/\n+/).filter(Boolean).map(x => `<p style="${TPL.p}">${esc(x)}</p>`).join("") + TPL.box; $$("div", rb).forEach(d => { if (!d.children.length && d.textContent.trim().startsWith('"')) d.textContent = `"${chLine(p.ch)}"`; if (!d.children.length && d.textContent.trim() === "You could say") { d.innerHTML = `${ic("say", 15)}You could say`; d.classList.add("lab-ic"); } }); const bx = rb.lastElementChild; if (bx) { bx.classList.add("say"); const end = document.createElement("div"); end.className = "ch-end"; end.textContent = `End of chapter ${p.ch + 1}`; bx.before(end); } rb.style.zoom = { "Standard": 1, "Large": 1.12, "Extra large": 1.25 }[S.textSize]; }
   const pl = $("[data-b=partslist]", sc);
   if (pl) pl.innerHTML = CHS().map((x, i) => { const t = document.createElement("template"); t.innerHTML = i < p.ch ? TPL.parts.done : i === p.ch ? TPL.parts.cur : TPL.parts.todo; const b = t.content.firstElementChild, sp = b.querySelectorAll(":scope > span"); sp[0].textContent = i; sp[1].textContent = x.title; sp[sp.length - 1].textContent = mm(x.secs); if (i === p.ch && sp.length > 3) sp[2].textContent = playing ? "Playing" : "Paused"; b.dataset.ch = i; return b.outerHTML; }).join("");
   $$("[data-b=firstline]", sc).forEach(e => { if (!e.isContentEditable) e.textContent = `"${p.custom || L().first_lines[p.line]}"`; });
@@ -1325,7 +1386,7 @@ function drawPlayer(sc){
     sp.className = "fl-row"; sp.removeAttribute("style"); sp.innerHTML = "";
     qs.forEach((q, i) => { const b = document.createElement("div"); b.className = "fl-card" + (sel === i ? " on" : ""); b.dataset.spark = i; b.setAttribute("role", "button"); b.innerHTML = `<small>Question ${i + 1} of ${qs.length}</small>${esc(q)}`; sp.append(b); });
     const own = document.createElement("div"); own.className = "fl-card" + (sel === "custom" ? " on" : ""); own.dataset.spark = "custom"; own.setAttribute("role", "button");
-    own.innerHTML = `<small>✎ Your own message</small><div data-b="ownmsg" contenteditable="true" style="min-height:44px;outline:none" aria-label="Write your own message">${esc(p.sparkOwn || "")}</div>`; sp.append(own);
+    own.innerHTML = `<small>Your own message</small><div data-b="ownmsg" contenteditable="true" style="min-height:44px;outline:none" aria-label="Write your own message">${esc(p.sparkOwn || "")}</div>`; sp.append(own);
     let hint = sp.nextElementSibling && sp.nextElementSibling.dataset.b === "sparkhint" ? sp.nextElementSibling : null;
     if (!hint) { hint = document.createElement("div"); hint.dataset.b = "sparkhint"; hint.setAttribute("style", "font-size:12.5px;color:#3D6B4E;margin:-4px 2px 8px"); sp.after(hint); }
     hint.textContent = qs.length ? "Swipe for more. Only your message is sent, nothing about Raise." : "Questions for this topic are being written. You can write your own."; }
@@ -1353,8 +1414,8 @@ function drawTalkPlan(sc){
   const chip = on => (on ? TPL.chipOn : TPL.chipOff) + ";flex:0 0 auto;scroll-snap-align:start";
   $("[data-b=tpdays]", sc).innerHTML = Array.from({ length: 7 }, (_, i) => { const d = addDays(i), v = iso(d), n = i === 0 ? "Today" : i === 1 ? "Tomorrow" : `${DAY[d.getDay()]} ${d.getDate()}`; return `<button data-tpday="${v}" aria-label="Day: ${n}" style="${chip(v === d0)}">${n}</button>`; }).join("");
   $("[data-b=tpplaces]", sc).innerHTML = ["after school", "after dinner", "on a walk", "on a phone call"].map(x => `<button data-tpplace="${x}" aria-label="Place: ${x}" style="${chip(x === p.place)}">${x[0].toUpperCase() + x.slice(1)}</button>`).join("");
-  $("[data-b=tpremind]", sc).textContent = `🔔 Reminder ${dayLabel(d0).replace("Tonight", "today")} at 7:30 pm · shows as "Evening walk"`;
-  const box = $("[data-b=wabox]", sc); if (box) box.style.display = p.waOpen ? "" : "none"; const ch = $("[data-b=wachev]", sc); if (ch) ch.textContent = p.waOpen ? "⌃" : "⌄";
+  $("[data-b=tpremind]", sc).innerHTML = `${ic("bell", 15)} Reminder ${esc(dayLabel(d0).replace("Tonight", "today"))} at 7:30 pm · shows as "Evening walk"`;
+  const box = $("[data-b=wabox]", sc); if (box) box.style.display = p.waOpen ? "" : "none"; const wt = $("[data-act=watoggle]", sc); if (wt) wt.setAttribute("aria-expanded", String(!!p.waOpen));
   const sv = $("[data-act=tpsave]", sc), tk = $("[data-act=tptalked]", sc), nt = $("[data-act=tpnot]", sc);
   if (sv) sv.style.display = planned ? "none" : "";
   if (tk) { if (!tk.dataset.full) tk.dataset.full = tk.getAttribute("style"); tk.setAttribute("style", planned ? tk.dataset.full : nt ? nt.getAttribute("style") : tk.dataset.full); tk.textContent = planned ? "We talked" : "We already talked"; }
@@ -1400,7 +1461,7 @@ function fill(sc){
 /* ---------------- navigation ---------------- */
 const hist = []; let cur = null;
 function show(id, push = true){
-  if (!scr(id)) return; closeLangMenu(); clearTimeout(drawReflection.tm); { const c = $("#celebrate"); if (c) c.remove(); }
+  if (!scr(id)) return; closeLangMenu(); clearTimeout(drawReflection.tm); { const c = $("#celebrate"); if (c) c.remove(); const r = scr("Reflection"); if (r) r.classList.remove("celebrating"); }
   if (id === "MyTopics" && !myTopics().length) id = "TopicsEmpty";
   if (id === "Home" && S.gateFor && S.t[S.gateFor] && S.t[S.gateFor].stage === "planned") { S.cur = S.gateFor; S.gateFor = null; save(); id = "Gate"; }
   if (["Player", "Read", "Parts", "Ready", "PickDay", "Spark", "Closing", "TalkCard"].includes(id) && !ready(T())) { toast("This lesson is still being written."); return; }
@@ -1608,7 +1669,7 @@ function handle(t){
   if (t.dataset.act === "tptalked") return show("Debrief");
   if (t.dataset.act === "tpnot") return show("NotYet");
   if (t.dataset.act === "celopen") { const c = $("#celebrate"); if (c) c.remove(); return openTopic(t.dataset.slug); }
-  if (t.dataset.act === "celclose") { const c = $("#celebrate"); if (c) c.remove(); return; }
+  if (t.dataset.act === "celclose") { const c = $("#celebrate"); if (c) c.remove(); scr("Reflection").classList.remove("celebrating"); return; }
   if (["After school", "After dinner", "On a walk", "On a phone call"].includes(k)) { p.place = k.toLowerCase(); choose(t); save(); return; }
   if (k === "Save my plan" || k === "Save and choose where to send") { const f = $(`#s-${sc} [data-b=flrow] [contenteditable=true]`) || $(`#s-${sc} [data-b=firstline][contenteditable=true]`); if (f) { f.contentEditable = "false"; const v = f.textContent.replace(/^["“]|["”]$/g, "").trim(); if (v && v !== noCite(L().first_lines[p.line])) p.custom = v; }
     p.date = p.date || today; p.stage = "planned"; S.gateFor = S.cur; save();
@@ -1743,12 +1804,12 @@ function upgrade(){
   // reflection: one scale caption, and a heading so it is clear the ratings are about this reflection
   const rfl = scr("Reflection"), rt0 = rfl && $("[data-rate]", rfl); if (rt0) { const caps = $$("div", rfl).filter(d => /^1 = not at all/.test(d.textContent)); caps.slice(0, -1).forEach(c => c.remove());
     let blk = rt0; while (blk.parentElement && !blk.parentElement.contains($$("div", rfl).find(e => !e.children.length && e.textContent.trim() === "Next for you"))) blk = blk.parentElement;
-    const h = document.createElement("div"); h.setAttribute("style", "font-size:13px;font-weight:700;color:#6B6375;margin:4px 0 2px"); h.textContent = "About this reflection"; blk.before(h); }
+    const h = document.createElement("div"); h.className = "sec-h"; h.textContent = "About this reflection"; blk.before(h); }
   // 7. first lines: three to swipe between
   ["Ready", "Spark"].forEach(id => { const sc = scr(id), f = sc && $("[data-b=firstline]", sc); if (!f) return; const box = f.parentElement; box.style.display = "none";
     const row = document.createElement("div"); row.className = "fl-row"; row.dataset.b = "flrow"; box.after(row);
     const tools = document.createElement("div"); tools.setAttribute("style", "flex-shrink:0;display:flex;justify-content:space-between;align-items:center;font-size:13px;color:#6B6375;margin:-6px 2px 2px");
-    tools.innerHTML = `<span data-b="flhint">Swipe to see all 3 lines</span><button data-act="editline" style="border:none;background:none;font:700 14px var(--font);color:#4A2C5A;cursor:pointer;height:36px">✎ Use my own words</button>`; row.after(tools);
+    tools.innerHTML = `<span data-b="flhint">Swipe to see all 3 lines</span><button data-act="editline" style="border:none;background:none;font:700 14px var(--font);color:#4A2C5A;cursor:pointer;height:36px;display:flex;align-items:center;gap:5px">${ic("pen", 15)}Use my own words</button>`; row.after(tools);
     $$("button", sc).filter(b => label(b) === "See 2 other lines").forEach(b => b.style.display = "none"); });
   // 8. the WhatsApp warm-up is its own green card
   ["Ready", "Spark"].forEach(id => { const sc = scr(id), sw = sc && $$("button[role=switch]", sc).find(b => label(b).startsWith("Send a curiosity question")); if (!sw) return;
@@ -1761,32 +1822,47 @@ function upgrade(){
   const tcl = scr("TalkCard") && $("[data-b=firstline]", scr("TalkCard")); if (tcl) { tcl.classList.add("say"); tcl.style.fontSize = "19px"; tcl.style.lineHeight = "1.38"; tcl.style.padding = "12px 16px"; tcl.style.marginBottom = "12px";
     const sw2 = startsText(scr("TalkCard"), "Start with"); if (sw2 && !sw2.children.length) sw2.textContent = "💬 Start with"; }
   // 10. lines to say in the lesson look like chat bubbles
-  ["Player", "Read", "Parts", "Doubt", "Boundary", "Ready", "Spark", "PickDay", "PlanSaved"].forEach(id => { const sc = scr(id); if (!sc) return; $$("[data-b=line]", sc).forEach(l => { const box = l.closest("div[style*='border-radius']"); if (box) box.classList.add("say"); const lab = l.previousElementSibling; if (lab && lab.textContent.trim() === "You could say") lab.textContent = "💬 You could say"; }); });
+  ["Player", "Read", "Parts", "Doubt", "Boundary", "Ready", "Spark", "PickDay", "PlanSaved"].forEach(id => { const sc = scr(id); if (!sc) return; $$("[data-b=line]", sc).forEach(l => { const box = l.closest("div[style*='border-radius']"); if (box) box.classList.add("say"); const lab = l.previousElementSibling; if (lab && lab.textContent.trim() === "You could say") { lab.innerHTML = `${ic("say", 15)}You could say`; lab.classList.add("lab-ic"); } }); });
   // 12. ONE talk plan, opened from everywhere: what to say, when, WhatsApp warm-up, tips, and the outcome
   const tcS = scr("TalkCard"), tfl = tcS && $("[data-b=firstline]", tcS); if (tfl) { const col = tfl.parentElement; col.style.paddingTop = "20px";
     const hd = document.createElement("div"); hd.setAttribute("style", "display:flex;align-items:center;justify-content:space-between;gap:8px");
     hd.innerHTML = `<div style="min-width:0"><h1 style="margin:0;font-size:22px;font-weight:700">Your talk plan</h1><div data-b="tptopic" style="font-size:14px;color:#6B6375;margin-top:2px"></div></div><button aria-label="Close" data-act="tpclose" style="border:none;background:#F3EEE8;width:44px;height:44px;border-radius:22px;cursor:pointer;font-size:24px;line-height:1;color:#2A2233;flex:none">×</button>`;
     col.prepend(hd); $("[data-b=when]", tcS).style.display = "none";
-    tfl.style.display = "none"; tfl.classList.remove("say"); const lab = tfl.previousElementSibling; if (lab) { lab.textContent = "💬 What to say"; lab.style.marginTop = "14px"; }
+    tfl.style.display = "none"; tfl.classList.remove("say"); const lab = tfl.previousElementSibling; if (lab) { lab.innerHTML = `${ic("say", 17)}What to say`; lab.classList.add("lab-ic"); lab.style.marginTop = "14px"; }
     const row = document.createElement("div"); row.className = "fl-row"; row.dataset.b = "flrow"; tfl.after(row);
     const tools = document.createElement("div"); tools.setAttribute("style", "flex-shrink:0;display:flex;justify-content:space-between;align-items:center;font-size:13px;color:#6B6375;margin:-6px 2px 0");
-    tools.innerHTML = `<span>Swipe to see all 3 lines</span><button data-act="editline" style="border:none;background:none;font:700 14px var(--font);color:#4A2C5A;cursor:pointer;height:36px">✎ Use my own words</button>`; row.after(tools);
+    tools.innerHTML = `<span>Swipe to see all 3 lines</span><button data-act="editline" style="border:none;background:none;font:700 14px var(--font);color:#4A2C5A;cursor:pointer;height:36px;display:flex;align-items:center;gap:5px">${ic("pen", 15)}Use my own words</button>`; row.after(tools);
     const when = document.createElement("div"); when.setAttribute("style", "flex-shrink:0");
-    when.innerHTML = `<div style="font-size:14px;font-weight:700;color:#4A2C5A;margin-top:8px">📅 When</div><div data-b="tpdays" class="fl-row" style="gap:8px;padding:6px 2px 4px"></div><div data-b="tpplaces" class="fl-row" style="gap:8px;padding:2px 2px 4px"></div><div data-b="tpremind" style="font-size:13.5px;color:#6B6375;margin:0 2px"></div>`;
+    when.innerHTML = `<div class="lab-ic" style="font-size:14px;font-weight:700;color:#4A2C5A;margin-top:8px">${ic("cal", 17)}When</div><div data-b="tpdays" class="fl-row" style="gap:8px;padding:6px 2px 4px"></div><div data-b="tpplaces" class="fl-row" style="gap:8px;padding:2px 2px 4px"></div><div data-b="tpremind" style="font-size:13.5px;color:#6B6375;margin:0 2px"></div>`;
     tools.after(when);
     const wa = document.createElement("div"); wa.setAttribute("style", "flex-shrink:0;margin-top:12px");
-    wa.innerHTML = `<button data-act="watoggle" aria-label="Warm up on WhatsApp first" style="border:none;font-family:inherit;cursor:pointer;width:100%;display:flex;align-items:center;gap:10px;text-align:left;background:#E8F8EE;border-radius:16px;padding:10px 12px;color:#2A2233">${WA_ICON}<span style="flex:1"><span style="display:block;font-size:15.5px;font-weight:700">Warm up on WhatsApp first</span><span style="display:block;font-size:13px;color:#3D6B4E">Send your teen a light question before you talk</span></span><span data-b="wachev" style="font-size:20px;color:#14743A">⌄</span></button>
+    wa.innerHTML = `<button data-act="watoggle" aria-label="Warm up on WhatsApp first" class="glass" style="font-family:inherit;cursor:pointer;width:100%;display:flex;align-items:center;gap:10px;text-align:left;background:linear-gradient(160deg,rgba(236,250,242,.8),rgba(255,255,255,.6))!important;border-radius:16px;padding:10px 12px;color:#2A2233">${WA_ICON}<span style="flex:1"><span style="display:block;font-size:15.5px;font-weight:700">Warm up on WhatsApp first</span><span style="display:block;font-size:13px;color:#3D6B4E">Send your teen a light question before you talk</span></span><span data-b="wachev" style="color:#1E7A4A;display:flex">${ic("chev", 20)}</span></button>
       <div data-b="wabox" class="wa-card" style="display:none"><div data-b="sparks"></div><button class="wa-btn" data-act="wasend">${WA_ICON.replace(/#1FA855/g, "#FFFFFF")}Send on WhatsApp</button></div>`;
     when.after(wa);
     const keep = startsText(tcS, "Keep in mind"), keepBox = keep && keep.parentElement, whyBox = $("[data-b=tcwhyhead]", tcS) && $("[data-b=tcwhyhead]", tcS).parentElement;
-    const det = document.createElement("details"); det.setAttribute("style", "flex-shrink:0;margin-top:12px;background:#FFFFFF;border-radius:18px;padding:0 14px;box-shadow:inset 0 0 0 1px #EFE6DA");
-    det.innerHTML = `<summary style="cursor:pointer;font-size:15px;font-weight:700;color:#4A2C5A;min-height:48px;display:flex;align-items:center;justify-content:space-between">💡 Tips, and what to do if it goes wrong <span aria-hidden="true">⌄</span></summary>`;
+    const det = document.createElement("details"); det.className = "glass"; det.setAttribute("style", "flex-shrink:0;margin-top:12px;border-radius:18px;padding:0 14px");
+    det.innerHTML = `<summary style="cursor:pointer;font-size:15px;font-weight:700;color:#4A2C5A;min-height:50px;display:flex;align-items:center;gap:8px">${ic("bulb", 18)}<span style="flex:1">Tips, and what to do if it goes wrong</span>${ic("chev", 20)}</summary>`;
     wa.after(det); [keepBox, whyBox].forEach(b => { if (b) { b.style.marginTop = "0"; b.style.marginBottom = "12px"; det.append(b); } });
     const talked = $$("button", tcS).find(b => label(b) === "We talked"); if (talked) { const sv = document.createElement("button"); sv.dataset.act = "tpsave"; sv.textContent = "Save my plan"; sv.setAttribute("style", talked.getAttribute("style")); talked.before(sv); talked.dataset.act = "tptalked"; }
     const nt = $$("button", tcS).find(b => label(b) === "Not today"); if (nt) nt.dataset.act = "tpnot";
     if (talked) talked.parentElement.style.marginTop = "16px"; }
   // "Talk card" is now "Talk plan" everywhere
   $$(".screen button, .screen a").forEach(b => { if (label(b) === "Open talk card") { const leaf = $$("*", b).filter(e => !e.children.length && e.textContent.trim() === "Open talk card").pop(); (leaf || b).textContent = "Open talk plan"; } });
+  // 13. lesson toolbar: three equal tiles (Chapters, Ask a doubt, Next), apart from "I am ready to talk"
+  ["Player", "Read"].forEach(id => { const sc = scr(id), chb = sc && $$("button", sc).find(b => label(b) === "Chapters"); if (!chb) return; const bar = chb.parentElement;
+    let nx = $$("button", bar).find(b => label(b) === "Next chapter"); if (!nx) { nx = document.createElement("button"); nx.setAttribute("style", chb.getAttribute("style")); bar.append(nx); }
+    const ask = $$("button", bar).find(b => label(b) === "Ask a doubt");
+    [[chb, "list", "Chapters", "Chapters", ""], [ask, "ask", "Ask a doubt", "Ask a doubt", "tb-ask"], [nx, "next", "Next chapter", "Next", "tb-next"]].forEach(([b, i, aria, txt, cls]) => { if (!b) return; b.setAttribute("aria-label", aria); b.innerHTML = `${ic(i, 22)}<span>${txt}</span>`; if (cls) b.classList.add(cls); bar.append(b); });
+    bar.classList.add("tb", "glass");
+    const rd = $$("button", sc).find(b => label(b) === "I am ready to talk"); if (rd) rd.classList.add("ready-gap");
+    $$("[data-b=chlabel]", sc).forEach(e => e.classList.add("ch-chip")); });
+  // 14. topic page: every action looks like a button
+  const tdS = scr("TopicDetail"); if (tdS) { const B = k => $$("button", tdS).find(b => label(b) === k);
+    [["Listen again", "play", "btn-o"], ["Change plan", "pen", "btn-o"], ["We talked", "check", "btn-f"], ["Open talk plan", "plan", "btn-f"], ["Remove from My topics", "trash", "btn-o btn-danger btn-center"]].forEach(([k, i, c]) => { const b = B(k); if (!b) return; b.setAttribute("aria-label", k); b.innerHTML = `${ic(i, 17)}${k}`; c.split(" ").forEach(x => b.classList.add(x)); }); }
+  // 15. reflection: bigger section headings; "Next for you" marked so it is never shown twice
+  const rfS = scr("Reflection"); if (rfS) { const nxl = $$("div", rfS).find(e => !e.children.length && e.textContent.trim() === "Next for you");
+    if (nxl) { nxl.classList.add("sec-h"); nxl.dataset.b = "rfnextblk"; const card = $("[data-b=rfnext]", rfS); const ce = card && (card.closest("div[style*='border-radius']") || card.parentElement); if (ce) { const wrap = document.createElement("div"); wrap.dataset.b = "rfnextblk"; ce.before(wrap); wrap.append(ce); }
+      const op = $$("button", rfS).find(b => label(b) === "Open"); if (op && op.parentElement) op.parentElement.dataset.b = "rfnextblk"; } }
   // 11. after "We talked", there is no "we have not talked yet"
   const dbq = scr("Debrief") && $$("button", scr("Debrief")).find(b => label(b) === "We have not talked yet"); if (dbq) dbq.style.display = "none";
   // 6. say what discreet mode is for
