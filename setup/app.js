@@ -90,7 +90,8 @@ const ICP = {
   plan: '<rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M16 2.5v4M8 2.5v4M3.5 10h17"/><path d="m9 15 2 2 4-4"/>',
   clock: '<circle cx="12" cy="12" r="9.5"/><path d="M12 7v5l3 2"/>',
   bookmark: '<path d="M7 3.5h10a1 1 0 0 1 1 1v16l-6-4-6 4v-16a1 1 0 0 1 1-1z"/>',
-  arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>' };
+  arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>',
+  prev: '<path d="M18 5l-9 7 9 7z"/><path d="M6 5v14"/>' };
 const ic = (n, sz = 18, col = "currentColor") => `<svg class="ic${n === "chev" ? " chev" : ""}" aria-hidden="true" width="${sz}" height="${sz}" viewBox="0 0 24 24" fill="none" stroke="${col}" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">${ICP[n]}</svg>`;
 /* ratings 1 to 5, tap again to clear */
 const RT_ON = "border:none;font-family:inherit;cursor:pointer;width:34px;height:34px;border-radius:17px;font-size:15px;font-weight:700;background:#4A2C5A;color:#FFFFFF;flex:0 0 auto";
@@ -328,7 +329,7 @@ function drawMyTopics(sc){
   $$("[data-topic]", sc).forEach(row => { const q = S.t[row.dataset.topic]; if (!q) return; const tx = $$("div", row).filter(d => !d.children.length && d.textContent.trim()); const sub = tx[1]; if (!sub) return;
     const [cls, icn, txt] = q.stage === "done" ? ["st-done", "check", `Done · talked ${dayLabel(q.talked || today).replace("Tonight", "today")}`]
       : q.stage === "planned" ? ["st-plan", "cal", `Talk ${dayLabel(q.date).replace("Tonight", "today")} · ${q.place}`]
-      : q.stage === "listening" ? ["st-go", "clock", sub.textContent.replace(/^Next: /, "")]
+      : q.stage === "listening" ? ["st-go", "clock", sub.textContent.replace(/^Next: /, "").replace(/^./, c => c.toUpperCase())]
       : q.stage === "heard" ? ["st-next", "plan", "Heard · plan your talk"] : ["st-saved", "bookmark", sub.textContent];
     sub.className = "st " + cls; sub.innerHTML = `${ic(icn, 15)}<span>${esc(txt)}</span>`;
     $$("button", row).forEach(b => { if (!b.classList.contains("btn-o")) { b.classList.add("btn-o"); b.style.height = "36px"; b.style.padding = "0 12px"; b.style.fontSize = "14px"; } }); });
@@ -673,6 +674,7 @@ function handle(t){
   // lesson
   if (t.dataset.ch !== undefined) { goChapter(+t.dataset.ch); return show(S.from || "Player"); }
   if (["Pause", "Play"].includes(k) && PLAYER_FAMILY.includes(sc)) return togglePlay();
+  if (k === "Previous chapter") { stop(); if (p.ch > 0) { goChapter(p.ch - 1); return refresh(); } return toast("This is the first chapter."); }
   if (k === "Back 10 seconds") return jump(-1);
   if (k === "Forward 10 seconds") return jump(1);
   if (k === "Save this line") { const ln = chLine(p.ch); if (p.saved.includes(ln)) return toast("You already saved this line."); p.saved.push(ln); save(); return toast("Line saved. It waits in this topic in My topics."); }
@@ -886,7 +888,7 @@ function upgrade(){
     when.innerHTML = `<div class="lab-ic" style="font-size:14px;font-weight:700;color:#4A2C5A;margin-top:8px">${ic("cal", 17)}When</div><div data-b="tpdays" class="fl-row" style="gap:8px;padding:6px 2px 4px"></div><div data-b="tpplaces" class="fl-row" style="gap:8px;padding:2px 2px 4px"></div><div data-b="tpremind" style="font-size:13.5px;color:#6B6375;margin:0 2px"></div>`;
     tools.after(when);
     const wa = document.createElement("div"); wa.setAttribute("style", "flex-shrink:0;margin-top:12px");
-    wa.innerHTML = `<button data-act="watoggle" aria-label="Warm up on WhatsApp first" class="glass" style="font-family:inherit;cursor:pointer;width:100%;display:flex;align-items:center;gap:10px;text-align:left;background:linear-gradient(160deg,rgba(236,250,242,.8),rgba(255,255,255,.6))!important;border-radius:16px;padding:10px 12px;color:#2A2233">${WA_ICON}<span style="flex:1"><span style="display:block;font-size:15.5px;font-weight:700">Warm up on WhatsApp first</span><span style="display:block;font-size:13px;color:#3D6B4E">Send your teen a light question before you talk</span></span><span data-b="wachev" style="color:#1E7A4A;display:flex">${ic("chev", 20)}</span></button>
+    wa.innerHTML = `<button data-act="watoggle" aria-label="Warm up on WhatsApp first" class="glass wa-toggle" style="font-family:inherit;cursor:pointer;width:100%;display:flex;align-items:center;gap:10px;text-align:left;border-radius:16px;padding:10px 12px;color:#2A2233">${WA_ICON}<span style="flex:1"><span style="display:block;font-size:15.5px;font-weight:700">Warm up on WhatsApp first</span><span style="display:block;font-size:13px;color:#3D6B4E">Send your teen a light question before you talk</span></span><span data-b="wachev" style="color:#1E7A4A;display:flex">${ic("chev", 20)}</span></button>
       <div data-b="wabox" class="wa-card" style="display:none"><div data-b="sparks"></div><button class="wa-btn" data-act="wasend">${WA_ICON.replace(/#1FA855/g, "#FFFFFF")}Send on WhatsApp</button></div>`;
     when.after(wa);
     const keep = startsText(tcS, "Keep in mind"), keepBox = keep && keep.parentElement, whyBox = $("[data-b=tcwhyhead]", tcS) && $("[data-b=tcwhyhead]", tcS).parentElement;
@@ -902,7 +904,8 @@ function upgrade(){
   ["Player", "Read"].forEach(id => { const sc = scr(id), chb = sc && $$("button", sc).find(b => label(b) === "Chapters"); if (!chb) return; const bar = chb.parentElement;
     let nx = $$("button", bar).find(b => label(b) === "Next chapter"); if (!nx) { nx = document.createElement("button"); nx.setAttribute("style", chb.getAttribute("style")); bar.append(nx); }
     const ask = $$("button", bar).find(b => label(b) === "Ask a doubt");
-    [[chb, "list", "Chapters", "Chapters", ""], [ask, "ask", "Ask a doubt", "Ask a doubt", "tb-ask"], [nx, "next", "Next chapter", "Next", "tb-next"]].forEach(([b, i, aria, txt, cls]) => { if (!b) return; b.setAttribute("aria-label", aria); b.innerHTML = `${ic(i, 22)}<span>${txt}</span>`; if (cls) b.classList.add(cls); bar.append(b); });
+    const pv = document.createElement("button"); pv.setAttribute("style", chb.getAttribute("style")); bar.prepend(pv);
+    [[pv, "prev", "Previous chapter", "Previous", "tb-prev"], [chb, "list", "Chapters", "Chapters", ""], [ask, "ask", "Ask a doubt", "Ask a doubt", "tb-ask"], [nx, "next", "Next chapter", "Next", "tb-next"]].forEach(([b, i, aria, txt, cls]) => { if (!b) return; b.setAttribute("aria-label", aria); b.innerHTML = `${ic(i, 22)}<span>${txt}</span>`; if (cls) b.classList.add(cls); bar.append(b); });
     bar.classList.add("tb", "glass");
     const rd = $$("button", sc).find(b => label(b) === "I am ready to talk"); if (rd) rd.classList.add("ready-gap");
     $$("[data-b=chlabel]", sc).forEach(e => e.classList.add("ch-chip")); });
@@ -913,6 +916,8 @@ function upgrade(){
   const rfS = scr("Reflection"); if (rfS) { const nxl = $$("div", rfS).find(e => !e.children.length && e.textContent.trim() === "Next for you");
     if (nxl) { nxl.classList.add("sec-h"); nxl.dataset.b = "rfnextblk"; const card = $("[data-b=rfnext]", rfS); const ce = card && (card.closest("div[style*='border-radius']") || card.parentElement); if (ce) { const wrap = document.createElement("div"); wrap.dataset.b = "rfnextblk"; ce.before(wrap); wrap.append(ce); }
       const op = $$("button", rfS).find(b => label(b) === "Open"); if (op && op.parentElement) op.parentElement.dataset.b = "rfnextblk"; } }
+  // 16. share with another parent: clearly a WhatsApp share
+  $$("button", scr("Closing")).filter(b => label(b) === "Share this topic with another parent").forEach(b => { b.setAttribute("aria-label", "Share this topic with another parent"); b.innerHTML = `${WA_ICON}<span>Share with a parent on WhatsApp</span>`; b.classList.add("btn-o", "wa-share"); });
   // 11. after "We talked", there is no "we have not talked yet"
   const dbq = scr("Debrief") && $$("button", scr("Debrief")).find(b => label(b) === "We have not talked yet"); if (dbq) dbq.style.display = "none";
   // 6. say what discreet mode is for

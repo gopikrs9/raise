@@ -51,7 +51,7 @@ body{background:var(--stage);font-family:var(--font);color:var(--ink);display:fl
 .glass{background:rgba(255,255,255,.62)!important;-webkit-backdrop-filter:blur(16px) saturate(140%);backdrop-filter:blur(16px) saturate(140%);border:1px solid rgba(255,255,255,.8);box-shadow:0 8px 24px rgba(74,44,90,.08)!important}
 .ic{flex:none;display:inline-block;vertical-align:-3px}
 /* lesson toolbar: three equal tiles, icon above a one-word label */
-.tb{display:grid!important;grid-template-columns:repeat(3,1fr);gap:8px;padding:8px;border-radius:22px;margin-top:14px!important}
+.tb{display:grid!important;grid-template-columns:repeat(4,1fr);gap:8px;padding:8px;border-radius:22px;margin-top:14px!important}
 .tb button{height:60px!important;width:100%;flex-direction:column!important;justify-content:center!important;align-items:center!important;gap:3px!important;border-radius:16px!important;font-size:13px!important;font-weight:700!important;padding:0 4px!important;background:rgba(255,255,255,.75)!important;color:#4A2C5A!important;margin:0!important;white-space:nowrap}
 .tb .tb-ask{background:#EFE6FA!important;color:#5B3A8C!important}
 .tb .tb-next{background:#FDE7D6!important;color:#9A4A16!important}
@@ -82,6 +82,44 @@ details summary::-webkit-details-marker{display:none}
 .st-saved{color:#6B6375!important}
 /* reflection: while the celebration is open, the page does not repeat "Next for you" */
 .celebrating [data-b=rfnextblk]{display:none!important}
+/* the line bubble on the player keeps one height, so the controls never move */
+#s-Player .say{height:184px;box-sizing:border-box;overflow-y:auto;overscroll-behavior:contain}
+.wa-toggle{background:linear-gradient(160deg,rgba(236,250,242,.8),rgba(255,255,255,.6))!important}
+.wa-share{width:100%;height:48px!important}
+
+/* ================= BETA 2 THEME: warm minimal + a touch of glass (body.t2) =================
+   one family of colours: plum = act, peach = say/highlight, glass white = surfaces,
+   status colours only as small text, WhatsApp green only on its icon */
+body.t2 #phone{background:linear-gradient(180deg,#FFF8F0 0%,#FBEDE4 58%,#F5E8EC 100%)}
+body.t2 .screen>div{background-color:transparent!important}
+body.t2 #s-Read>div{background:#FFF8F0!important}
+body.t2 .screen [style*="background: #FFFFFF"]:not(button){background:rgba(255,255,255,.78)!important;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 6px 20px rgba(74,44,90,.07),inset 0 0 0 1px rgba(255,255,255,.85)!important}
+body.t2 .glass{background:rgba(255,255,255,.72)!important}
+/* say = peach */
+body.t2 .screen .say.say,body.t2 .say{background:rgba(253,235,221,.94)!important;box-shadow:none!important}
+body.t2 .say::after{border-color:rgba(253,235,221,.92) transparent transparent transparent}
+body.t2 .fl-card{background:rgba(255,255,255,.8);box-shadow:inset 0 0 0 1px rgba(232,223,211,.9)}
+body.t2 .fl-card.on{background:#FDEBDD;box-shadow:inset 0 0 0 2px #4A2C5A}
+body.t2 .ch-chip{background:#FDEBDD;color:#7A3E1A!important}
+/* toolbar: four equal glass tiles; only Next is peach */
+body.t2 .tb button{background:rgba(255,255,255,.82)!important;color:#4A2C5A!important}
+body.t2 .tb .tb-ask{background:rgba(255,255,255,.82)!important;color:#4A2C5A!important}
+body.t2 .tb .tb-next{background:#FDEBDD!important;color:#4A2C5A!important}
+/* WhatsApp: glass surfaces, plum outline buttons, green only on the icon */
+body.t2 .wa-toggle{background:rgba(255,255,255,.75)!important}
+body.t2 .wa-toggle span span:last-child{color:#6B6375!important}
+body.t2 .wa-card{background:rgba(255,255,255,.7)!important;box-shadow:0 6px 20px rgba(74,44,90,.07)!important}
+body.t2 .wa-card .fl-card{background:rgba(255,255,255,.88);box-shadow:inset 0 0 0 1px rgba(232,223,211,.9)}
+body.t2 .wa-card .fl-card.on{background:#FDEBDD;box-shadow:inset 0 0 0 2px #4A2C5A}
+body.t2 .wa-btn{background:rgba(255,255,255,.75)!important;color:#4A2C5A!important;border:1.5px solid #4A2C5A!important;box-shadow:none!important}
+body.t2 .wa-btn svg path{fill:#25D366}
+body.t2 .wa-card [data-b=sparkhint]{color:#6B6375!important}
+body.t2 .wa-card>div:first-child{color:#4A2C5A!important}
+/* buttons */
+body.t2 .btn-o{background:rgba(255,255,255,.72)!important;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+/* status: muted, warm-compatible */
+body.t2 .st-done{color:#2F7D57!important} body.t2 .st-plan{color:#C2453D!important} body.t2 .st-go{color:#B7791F!important}
+@media (prefers-reduced-transparency:reduce){ body.t2 .glass, body.t2 .screen [style*="background: #FFFFFF"]{-webkit-backdrop-filter:none;backdrop-filter:none;background:#FFFFFF!important} }
 /* reflection: a small celebration with the next topic */
 #celebrate{position:absolute;left:12px;right:12px;bottom:88px;z-index:40;background:rgba(255,255,255,.88);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.9);border-radius:24px;box-shadow:0 14px 40px rgba(42,34,51,.28);padding:16px;animation:rise .35s ease-out}
 @keyframes rise{0%{transform:translateY(30px);opacity:0}100%{transform:none;opacity:1}}

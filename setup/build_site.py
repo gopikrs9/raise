@@ -22,6 +22,6 @@ page = page.replace("@media (max-width:760px){ #index{display:none} body{gap:0} 
 page = page.replace('<a href="privacy.html"', '<a href="privacy.html"')
 # the screen list is a reviewer tool: hidden in the real app, shown only with ?review
 page = page.replace("</style>", "body:not(.review) #index{display:none} body:not(.review){gap:0}\n</style>", 1)
-page = page.replace("<body>", "<body>\n<script>if (/[?&]review\\b/.test(location.search)) document.body.classList.add('review');</script>", 1)
+page = page.replace("<body>", ("<body class=\"t2\">" if (len(sys.argv) > 1 and sys.argv[1] == "beta2") else "<body>") + "\n<script>if (/[?&]review\\b/.test(location.search)) document.body.classList.add('review');</script>", 1)
 open(f"{SITE}/index.html", "w").write(page)
 print("site bytes", len(page))
