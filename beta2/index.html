@@ -123,6 +123,10 @@ body.t2 .btn-o{background:rgba(255,255,255,.72)!important;-webkit-backdrop-filte
 /* status: muted, warm-compatible */
 body.t2 .st-done{color:#2F7D57!important} body.t2 .st-plan{color:#C2453D!important} body.t2 .st-go{color:#B7791F!important}
 @media (prefers-reduced-transparency:reduce){ body.t2 .glass, body.t2 .screen [style*="background: #FFFFFF"]{-webkit-backdrop-filter:none;backdrop-filter:none;background:#FFFFFF!important} }
+/* logo: heart symbol + RAISE */
+.lockup{display:inline-flex;align-items:center;gap:10px}
+.lockup-sym svg{width:100%;height:100%;display:block}
+.lockup-word{font-family:var(--font);font-weight:800;letter-spacing:.14em;color:#4A2C5A;line-height:1}
 /* wordmark */
 .wm{font-family:var(--font);font-weight:800;color:#4A2C5A;letter-spacing:-.03em;line-height:1;display:inline-block}
 .wm-i{position:relative;display:inline-block;width:.26em;height:.53em;margin:0 .035em;vertical-align:baseline}
@@ -1100,6 +1104,8 @@ const ICP = {
   x: '<path d="M6 6l12 12M18 6 6 18"/>' };
 const ic = (n, sz = 18, col = "currentColor") => `<svg class="ic${n === "chev" ? " chev" : ""}" aria-hidden="true" width="${sz}" height="${sz}" viewBox="0 0 24 24" fill="none" stroke="${col}" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">${ICP[n]}</svg>`;
 /* the Raise wordmark: lowercase, the dot of the i is a lifted apricot spark */
+const LOGO_SYM = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="92 104 328 300" role="img" aria-label="Raise"> <defs> <clipPath id="sheart"><path d="M256 392 C150 312 92 246 116 176 C136 118 218 108 256 166 C294 108 376 118 396 176 C420 246 362 312 256 392 Z"/></clipPath> <path id="shead" d="M170 180 C176 160 206 152 226 165 C239 174 243 190 241 203 L251 217 L242 222 C245 228 241 232 239 236 C241 243 237 250 227 254 C219 258 213 262 209 270 L211 292 L182 292 L184 262 C168 252 158 236 158 214 C158 198 163 188 170 180 Z"/> </defs><g clip-path="url(#sheart)"> <g fill="#4A2C5A"> <circle cx="163" cy="186" r="19"/> <use xlink:href="#shead" href="#shead"/> <path d="M116 400 C118 322 154 290 196 288 C238 290 270 318 278 400 Z"/> </g> <g fill="#4A2C5A" stroke="#FFF3EA" stroke-width="7" paint-order="stroke"> <use xlink:href="#shead" href="#shead" transform="translate(461 70) scale(-0.78 0.78)"/> <path d="M256 400 C260 330 280 298 307 296 C334 298 358 328 366 400 Z"/> </g> </g> <path d="M256 392 C150 312 92 246 116 176 C136 118 218 108 256 166 C294 108 376 118 396 176 C420 246 362 312 256 392 Z" fill="none" stroke="#F4A261" stroke-width="20" stroke-linejoin="round"/> </svg>`;
+const lockup = (h = 52) => `<span class="lockup" role="img" aria-label="Raise"><span class="lockup-sym" style="height:${h}px;width:${Math.round(h * 328 / 300)}px">${LOGO_SYM}</span><span class="lockup-word" style="font-size:${Math.round(h * .5)}px">RAISE</span></span>`;
 const wordmark = (sz = 30) => `<span class="wm" style="font-size:${sz}px" role="img" aria-label="Raise">ra<span class="wm-i"><span class="wm-stem"></span><span class="wm-dot"></span></span>se</span>`;
 /* ratings 1 to 5, tap again to clear */
 const RT_ON = "border:none;font-family:inherit;cursor:pointer;width:34px;height:34px;border-radius:17px;font-size:15px;font-weight:700;background:#4A2C5A;color:#FFFFFF;flex:0 0 auto";
@@ -1931,7 +1937,7 @@ function upgrade(){
     if (hero) { const art = [...hero.children].find(k => k.tagName.toLowerCase() === "svg"); const h = document.createElement("div"); h.className = "hero";
       h.innerHTML = `<div class="hb hb-p"><small>You</small>"I noticed you've been up late. Is everything okay?"</div><div class="hb hb-t"><small>Your teen</small>"Kind of… can we talk after dinner?"</div><div class="hero-cap">Raise gives you the first line. You have the talk.</div>`;
       if (art) art.replaceWith(h); else hero.append(h); }
-    const nm = $$("div", sc).find(d => !d.children.length && d.textContent.trim() === "Raise"); if (nm) { nm.innerHTML = wordmark(30); nm.setAttribute("aria-label", "Raise"); } });
+    const nm = $$("div", sc).find(d => !d.children.length && d.textContent.trim() === "Raise"); if (nm) { nm.innerHTML = lockup(52); nm.setAttribute("aria-label", "Raise"); } });
   // 18. back, minimise and close: one clear round button
   $$(".screen button[aria-label=Back], .screen button[aria-label=Minimise]").forEach(b => { b.classList.add("nav-btn"); b.innerHTML = ic(b.getAttribute("aria-label") === "Back" ? "back" : "chev", 22); });
   $$("[data-act=tpclose]").forEach(b => { b.classList.add("nav-btn"); b.innerHTML = ic("x", 20); });
