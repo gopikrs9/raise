@@ -1505,10 +1505,10 @@ function drawLang(sc, id){
   const lg = S.lang || "en", t = T();
   $$("[data-b=langbar]", sc).forEach(bar => { $$("button", bar).forEach(b => b.setAttribute("style", b.dataset.lang === lg ? LB_ON : LB_OFF));
     let note = bar.querySelector("[data-b=langnote]"); if (!note) { note = document.createElement("div"); note.dataset.b = "langnote"; note.setAttribute("style", "flex-basis:100%;font-size:12.5px;color:#6B6375"); bar.append(note); }
-    note.textContent = lg !== "en" && t && ready(t) && !hasLang(t, lg) ? `The ${LANG_NAME[lg]} version of this lesson is still being checked, so it shows in English for now.` : lg !== "en" ? "Beta: lesson text in your language. Buttons stay in English for now." : ""; });
+    note.textContent = lg !== "en" && t && ready(t) && !hasLang(t, lg) ? `The ${LANG_NAME[lg]} version of this lesson is still being checked, so it shows in English for now.` : lg !== "en" ? "Lesson text in your language. Buttons stay in English for now." : ""; });
   if (id === "Language") {
     $$("button", sc).forEach(b => { const k = label(b), lg = /Telugu|తెలుగు/.test(k) ? "te" : /Hindi|हिन्दी/.test(k) ? "hi" : /^English/.test(k) ? "en" : null; if (!lg) return;
-      $$("*", b).filter(e => !e.children.length && /Coming soon|Beta/.test(e.textContent)).forEach(e => e.textContent = "Beta");
+      $$("*", b).filter(e => !e.children.length && /^\s*(Coming soon|Beta)\s*$/.test(e.textContent)).forEach(e => e.remove());
       if (lg === (S.lang || "en") && !b.dataset.on) { choose(b); } b.dataset.on = lg === (S.lang || "en") ? "1" : ""; });
   }
 }
